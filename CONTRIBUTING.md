@@ -1,14 +1,21 @@
-
+This repository contains sample code that shows how to use the NSX-T API, and
+specifically, how to use the NSX-T Java and Python SDKs to create and manage
+virtual networks. You can download these SDKs from the VMWARE {code}(tm) web
+site at https://code.vmware.com/home.
 
 # Contributing to nsx-t
 
-The nsx-t project team welcomes contributions from the community. If you wish to contribute code and you have not
-signed our contributor license agreement (CLA), our bot will update the issue when you open a Pull Request. For any
-questions about the CLA process, please refer to our [FAQ](https://cla.vmware.com/faq).
+The nsx-t project team welcomes contributions from the community.
+If you wish to contribute code and you have not signed our
+contributor license agreement (CLA), our bot will update the
+issue when you open a Pull Request. For any questions about the
+CLA process, please refer to our
+[FAQ](https://cla.vmware.com/faq).
 
 ## Community
 
 ## Getting Started
+
 
 ## Contribution Flow
 
@@ -70,14 +77,26 @@ notification when you git push.
 
 ### Formatting Commit Messages
 
-We follow the conventions on [How to Write a Git Commit Message](http://chris.beams.io/posts/git-commit/).
+We follow the conventions on [How to Write a Git Commit
+Message](http://chris.beams.io/posts/git-commit/).
 
-Be sure to include any related GitHub issue references in the commit message.  See
-[GFM syntax](https://guides.github.com/features/mastering-markdown/#GitHub-flavored-markdown) for referencing issues
-and commits.
+Be sure to include any related GitHub issue references in the
+commit message.  See [GFM
+syntax](https://guides.github.com/features/mastering-markdown/#GitHub-flavored-markdown)
+for referencing issues and commits.
 
 ## Reporting Bugs and Creating Issues
 
 When opening a new issue, try to roughly follow the commit message format conventions above.
 
 ## Repository Structure
+
+./java - SDK samples for the Java programming language
+  - the Java examples are structured as a Maven repository and can be
+    compiled with the command "mvn install". For more information, read
+    the README.md file in the java directory.
+
+./python - SDK samples for the Python programming language
+  - For more information, read the README.md file in the python directory.
+
+
