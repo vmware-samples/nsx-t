@@ -103,44 +103,10 @@ Each sample takes the following command-line arguments:
      -u,--user <arg>               User to authenticate as
      -p,--password <arg>           Password
 
-The following samples are currently available:
-
-**basics/crud.py**
-A basic demo showing how to perform create, read, update, delete,
-and list operations using the NSX-T REST API.
-
-**basics/crud-policy.py**
-A basic demo showing how to perform create, read, update, delete,
-and list operations using the NSX-T Policy REST API.
-
-**basics/fabric-nodes.py**
-Shows how to retrieve information on fabric nodes and their
-current status.
-
-**basics/l3-demo.py**
-A demonstration of layer 3 routing. This demo creates two logical
-switches, attaches the switches via a logical router, then sets
-a firewall policy that blocks all traffic except on ports used
-by Microsoft SQL Server.
-
-**basics/tagging.py**
-Shows how to set tags (arbitrary user-supplied metadata) on
-NSX resources.
-
-**operations/logical-stats.py**
-Shows how to retrieve status and statistics for NSX logical
-entities like Logical Ports, Logical Router Ports,  and Logical
-Switches.
-
-**operations/physical-stats.py**
-Shows how to retrieve status and statistics for the physical
-underlay of NSX, like the physical interfaces of Transport
-Nodes.
-
 Each sample has a comment block at the top with more information.
 
-So, to run the crud.py example on host 10.162.18.202, authenticating
-as user "admin" with password "Secret!23":
+As an example, to run the crud.py example on host 10.162.18.202,
+authenticating as user "admin" with password "Secret!23":
 
     python basics/crud.py -n 10.162.18.202 -u admin -p "Secret!23"
 
