@@ -1,7 +1,42 @@
-LICENSE HERE
-
 Sample code for VMware NSX-T Python SDK
 =======================================
+
+NSX-T SDK Sample Code
+
+Copyright 2017 VMware, Inc.  All rights reserved
+
+The BSD-2 license (the "License") set forth below applies to all
+parts of the NSX-T SDK Sample Code project.  You may not use this
+file except in compliance with the License.
+
+BSD-2 License
+
+Redistribution and use in source and binary forms, with or
+without modification, are permitted provided that the following
+conditions are met:
+
+	Redistributions of source code must retain the above
+	copyright notice, this list of conditions and the
+	following disclaimer.
+
+	Redistributions in binary form must reproduce the above
+	copyright notice, this list of conditions and the
+	following disclaimer in the documentation and/or other
+	materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
 
 Overview
 --------
@@ -40,7 +75,7 @@ To install the SDK and its dependencies, issue the following commands:
     # site at:
     # https://my.vmware.com/web/vmware/details?downloadGroup=NSX-T-210-SDK-PYTHON&productId=673
     # Copy all SDK files to the lib directory in this repo.
- 
+
     # 4) install the NSX-T SDK, and the vapi runtime
     pip install lib/*.whl
 
@@ -61,43 +96,43 @@ Running the samples
 
 Each sample takes the following command-line arguments:
 
-     -h,--help                     Get help  
-     -n,--nsx_host <arg>           NSX host to connect to  
-     -t,--tcp_port <arg>           TCP port for NSX server (optional, defaults  
-                                   to 443)  
-     -u,--user <arg>               User to authenticate as  
-     -p,--password <arg>           Password  
+     -h,--help                     Get help
+     -n,--nsx_host <arg>           NSX host to connect to
+     -t,--tcp_port <arg>           TCP port for NSX server (optional, defaults
+                                   to 443)
+     -u,--user <arg>               User to authenticate as
+     -p,--password <arg>           Password
 
 The following samples are currently available:
 
-**basics/crud.py**  
+**basics/crud.py**
 A basic demo showing how to perform create, read, update, delete,
 and list operations using the NSX-T REST API.
 
-**basics/crud-policy.py**  
+**basics/crud-policy.py**
 A basic demo showing how to perform create, read, update, delete,
 and list operations using the NSX-T Policy REST API.
 
-**basics/fabric-nodes.py**  
+**basics/fabric-nodes.py**
 Shows how to retrieve information on fabric nodes and their
 current status.
 
-**basics/l3-demo.py**  
+**basics/l3-demo.py**
 A demonstration of layer 3 routing. This demo creates two logical
 switches, attaches the switches via a logical router, then sets
 a firewall policy that blocks all traffic except on ports used
 by Microsoft SQL Server.
 
-**basics/tagging.py**  
+**basics/tagging.py**
 Shows how to set tags (arbitrary user-supplied metadata) on
 NSX resources.
 
-**operations/logical-stats.py**  
+**operations/logical-stats.py**
 Shows how to retrieve status and statistics for NSX logical
 entities like Logical Ports, Logical Router Ports,  and Logical
 Switches.
 
-**operations/physical-stats.py**  
+**operations/physical-stats.py**
 Shows how to retrieve status and statistics for the physical
 underlay of NSX, like the physical interfaces of Transport
 Nodes.
@@ -124,5 +159,5 @@ Troubleshooting
 If you are running on MacOS, the following guides may help you get
 python, pip, and virtualenv installed:
 
-[Install Python on Mac OS X for development](http://exponential.io/blog/2015/02/11/install-python-on-mac-os-x-for-development/)  
+[Install Python on Mac OS X for development](http://exponential.io/blog/2015/02/11/install-python-on-mac-os-x-for-development/)
 [Install virtualenv and virtualenvwrapper on Mac OS X](http://exponential.io/blog/2015/02/10/install-virtualenv-and-virtualenvwrapper-on-mac-os-x/)
