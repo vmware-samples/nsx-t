@@ -1,14 +1,4 @@
-# *******************************************************
-# Copyright VMware, Inc. 2017.  All Rights Reserved.
-# SPDX-License-Identifier: BSD-2
-# *******************************************************
-#
-# DISCLAIMER. THIS PROGRAM IS PROVIDED TO YOU "AS IS" WITHOUT
-# WARRANTIES OR CONDITIONS OF ANY KIND, WHETHER ORAL OR WRITTEN,
-# EXPRESS OR IMPLIED. THE AUTHOR SPECIFICALLY DISCLAIMS ANY IMPLIED
-# WARRANTIES OR CONDITIONS OF MERCHANTABILITY, SATISFACTORY QUALITY,
-# NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE.
-
+LICENSE HERE
 
 Sample code for VMware NSX-T Python SDK
 =======================================
