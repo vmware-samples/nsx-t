@@ -15,14 +15,14 @@ Redistribution and use in source and binary forms, with or
 without modification, are permitted provided that the following
 conditions are met:
 
-	Redistributions of source code must retain the above
-	copyright notice, this list of conditions and the
-	following disclaimer.
+    Redistributions of source code must retain the above
+    copyright notice, this list of conditions and the
+    following disclaimer.
 
-	Redistributions in binary form must reproduce the above
-	copyright notice, this list of conditions and the
-	following disclaimer in the documentation and/or other
-	materials provided with the distribution.
+    Redistributions in binary form must reproduce the above
+    copyright notice, this list of conditions and the
+    following disclaimer in the documentation and/or other
+    materials provided with the distribution.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
 CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
@@ -93,12 +93,13 @@ def main():
     lp_ids = [lp.id for lp in all_lps]
     fail = False
     for port in ports:
-        if not port in lp_ids:
+        if port not in lp_ids:
             print("Logical port %s not found" % port)
             fail = True
     if fail:
         sys.exit(1)
-    print("Checking forwarding path between %s and %s" % (args.port1, args.port2))
+    print("Checking forwarding path between %s and %s" %
+          (args.port1, args.port2))
     if len(ports) == 0:
         # Print all the ports
         for lp in all_lps:

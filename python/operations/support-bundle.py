@@ -18,7 +18,8 @@ from com.vmware.nsx.administration_client import SupportBundles
 from com.vmware.nsx.model_client import SupportBundleRequest
 from com.vmware.nsx.model_client import SupportBundleRemoteFileServer
 from com.vmware.nsx.model_client import SupportBundleFileTransferProtocol
-from com.vmware.nsx.model_client import SupportBundleFileTransferAuthenticationScheme
+from com.vmware.nsx.model_client import (
+    SupportBundleFileTransferAuthenticationScheme)
 from com.vmware.nsx.cluster_client import Nodes
 from vmware.vapi.bindings.struct import PrettyPrinter
 
@@ -76,20 +77,21 @@ def main():
     mgr_uuid = mgr_node.id
     print mgr_uuid
 
+    protocol = SupportBundleFileTransferProtocol(
+        name="SCP",
+        authentication_scheme=SupportBundleFileTransferAuthenticationScheme(
+            scheme_name="PASSWORD",
+            username=args.remote_ssh_user,
+            password=args.remote_ssh_password
+        ),
+        ssh_fingerprint=args.remote_ssh_fingerprint
+    )
     rfs = SupportBundleRemoteFileServer(
         directory_path="/tmp",
         server=args.remote_ssh_server,
-        protocol=SupportBundleFileTransferProtocol(
-            name="SCP",
-            authentication_scheme=SupportBundleFileTransferAuthenticationScheme(
-                scheme_name="PASSWORD",
-                username=args.remote_ssh_user,
-                password=args.remote_ssh_password
-            ),
-            ssh_fingerprint=args.remote_ssh_fingerprint
-        )
+        protocol=protocol
     )
-  
+
     sb_request = SupportBundleRequest(
         log_age_limit=1,
         nodes=[mgr_uuid],
