@@ -1,2 +1,10 @@
 *.pyc
 *.pyo
+.DS_Store
+
+java/lib
+java/target
+
+.classpath
+.project
+.settings
