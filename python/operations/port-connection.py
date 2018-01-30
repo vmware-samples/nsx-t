@@ -52,6 +52,8 @@ from vmware.vapi.bindings.struct import PrettyPrinter
 This example shows how to retrieve the forwarding path between
 two logical ports.
 
+Compatible with: NSX-T 2.1
+
 APIs used:
 
 List logical ports:

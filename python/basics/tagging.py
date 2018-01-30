@@ -87,6 +87,8 @@ scope "breach". When you add the "security:breach" tag
 to a port, it will become a member of that group and
 the block-all firewall policy will become effective.
 
+Compatible with: NSX-T 2.1
+
 APIs used:
 
 Create transport zone:

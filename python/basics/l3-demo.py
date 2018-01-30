@@ -94,6 +94,8 @@ Topology:
   +------------+                +------------+
   192.168.1.0/24                192.168.2.1/24
 
+Compatible with: NSX-T 2.1
+
 APIs used:
 
 Create a trasport zone:

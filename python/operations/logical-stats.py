@@ -56,6 +56,8 @@ from vmware.vapi.bindings.struct import PrettyPrinter
 This example shows how to get statistics and counters for various
 logical entities in an NSX-T environment.
 
+Compatible with: NSX-T 2.1
+
 APIs used:
 
 List logical switches:

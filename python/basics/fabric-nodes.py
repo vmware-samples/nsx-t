@@ -50,6 +50,8 @@ from com.vmware.vapi.std.errors_client import NotFound
 This example shows how to obtain a list of all fabric nodes
 and query their status.
 
+Compatible with: NSX-T 2.1
+
 APIs used:
 
 List fabric nodes

@@ -53,6 +53,8 @@ from com.vmware.vapi.std.errors_client import NotFound
 This example shows how to create a basic domain in the
 NSX Policy service.
 
+Compatible with: NSX-T 2.1
+
 APIs used:
 
 List infra domains:

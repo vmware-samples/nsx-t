@@ -52,6 +52,8 @@ from com.vmware.vapi.std.errors_client import Error
 This example shows how to catch and process errors from NSX
 API calls
 
+Compatible with: NSX-T 2.1
+
 APIs used:
 
 Create a transport zone:

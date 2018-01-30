@@ -52,6 +52,8 @@ This example shows basic CRUD (create, read, update, delete) operations.
 Using one of the simplest NSX resource types, a Transport Zone, we will
 show how create, read, update, and delete operations are performed.
 
+Compatible with: NSX-T 2.1
+
 APIs used:
 
 List transport zones:

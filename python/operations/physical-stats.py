@@ -59,6 +59,10 @@ This example shows how to get statistics and counters for the fabric
 nodes (hosts and edges) in an NSX-T environment. Overall status
 and network interface information are displayed. APIs used:
 
+Compatible with: NSX-T 2.1
+
+APIs used:
+
 List fabric nodes:
 GET /api/v1/fabric/nodes
 
