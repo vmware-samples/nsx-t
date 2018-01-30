@@ -72,8 +72,8 @@ To install the SDK and its dependencies, issue the following commands:
 
     # 3) Copy the NSX-T SDKs and vapi runtime:
     # For NSX-T 2.1, navigate to the VMware{code} website python SDK
-    # site at:
-    # https://my.vmware.com/web/vmware/details?downloadGroup=NSX-T-210-SDK-PYTHON&productId=673
+    # site at https://code.vmware.com/sdks and follow the
+    # VMware NSX-T for Python link.
     # Copy all SDK files to the lib directory in this repo.
 
     # 4) install the NSX-T SDK, and the vapi runtime
