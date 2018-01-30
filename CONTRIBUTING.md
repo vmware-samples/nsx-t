@@ -12,10 +12,11 @@ issue when you open a Pull Request. For any questions about the
 CLA process, please refer to our
 [FAQ](https://cla.vmware.com/faq).
 
-## Community
-
-## Getting Started
-
+Before you start working with the nsx-t samples, please read our
+[Developer Certificate of Origin](https://cla.vmware.com/dco).
+All contributions to this repository must be signed as described
+on that page. Your signature certifies that you wrote the patch
+or have the right to pass it on as an open-source patch.
 
 ## Contribution Flow
 
@@ -38,7 +39,8 @@ git push origin my-new-feature
 
 ### Staying In Sync With Upstream
 
-When your branch gets out of sync with the vmware/master branch, use the following to update:
+When your branch gets out of sync with the vmware/master branch,
+use the following to update:
 
 ``` shell
 git checkout my-new-feature
@@ -74,6 +76,9 @@ Be sure to add a comment to the PR indicating your new changes are ready to revi
 notification when you git push.
 
 ### Code Style
+
+Please run the pep8 style checker on your code and fix any style
+problems before submitting a pull request.
 
 ### Formatting Commit Messages
 
