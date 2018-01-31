@@ -4,6 +4,8 @@
 
 java/lib
 java/target
+python/lib
+python/venv
 
 .classpath
 .project
