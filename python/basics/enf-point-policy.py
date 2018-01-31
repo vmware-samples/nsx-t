@@ -64,6 +64,12 @@ Compatible with: NSX-T 2.2
 
 APIs used:
 
+List enforcementpoints for infra
+GET /policy/api/v1/infra/deployment-zones/default/enforcement-points
+
+Patch a new Enforcement Point under infra
+PATCH /policy/api/v1/infra/deployment-zones/<deployment-zone-id>/enforcement-points/<enforcementpoint-id>
+
 """
 
 
