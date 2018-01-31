@@ -5,13 +5,6 @@ site at https://code.vmware.com/home.
 
 # Contributing to nsx-t
 
-The nsx-t project team welcomes contributions from the community.
-If you wish to contribute code and you have not signed our
-contributor license agreement (CLA), our bot will update the
-issue when you open a Pull Request. For any questions about the
-CLA process, please refer to our
-[FAQ](https://cla.vmware.com/faq).
-
 Before you start working with the nsx-t samples, please read our
 [Developer Certificate of Origin](https://cla.vmware.com/dco).
 All contributions to this repository must be signed as described
