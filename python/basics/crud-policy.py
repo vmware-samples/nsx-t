@@ -43,11 +43,11 @@ import random
 import sys
 from util import auth
 from util import getargs
-from vmware.vapi.bindings.struct import PrettyPrinter
 from com.vmware.nsx_policy_client import Infra
 from com.vmware.nsx_policy.infra_client import Domains
 from com.vmware.nsx_policy.model_client import Domain
 from com.vmware.vapi.std.errors_client import NotFound
+from vmware.vapi.bindings.struct import PrettyPrinter
 
 """
 This example shows how to create a basic domain in the

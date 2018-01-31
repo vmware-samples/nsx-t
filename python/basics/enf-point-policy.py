@@ -39,21 +39,20 @@ ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 
-import random
 import sys
 
 from util import auth
 from util import getargs
 
-from com.vmware.nsx.model_client import ApiError
+from com.vmware.nsx_policy.model_client import ApiError
 from com.vmware.nsx_policy_client import Infra
-from com.vmware.nsx_policy.infra_client import DeploymentZones
 from com.vmware.nsx_policy.infra.deployment_zones_client import (
     EnforcementPoints)
-from com.vmware.vapi.std.errors_client import NotFound
+from com.vmware.nsx_policy.infra_client import DeploymentZones
 from com.vmware.nsx_policy.model_client import EnforcementPoint
 from com.vmware.nsx_policy.model_client import NSXTConnectionInfo
 from com.vmware.vapi.std.errors_client import Error
+from com.vmware.vapi.std.errors_client import NotFound
 from vmware.vapi.bindings.struct import PrettyPrinter
 
 """
@@ -122,7 +121,6 @@ def main():
     try:
         ep_svc.patch(DEFAULT_DZ_ID, "example", ep)
     except Error as ex:
-        import pdb; pdb.set_trace()
         api_error = ex.data.convert_to(ApiError)
         print "An error occurred: %s" % api_error.error_message
 
