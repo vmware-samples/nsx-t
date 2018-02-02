@@ -85,7 +85,7 @@ def main():
         result_tz = transportzones_svc.create(new_tz)
     except Error as ex:
         api_error = ex.data.convert_to(ApiError)
-        print "An error occurred: %s" % api_error.error_message
+        print("An error occurred: %s" % api_error.error_message)
 
 
 if __name__ == "__main__":

@@ -75,7 +75,7 @@ def main():
     # request a support bundle from it.
     mgr_node = cl_node_svc.get("self")
     mgr_uuid = mgr_node.id
-    print mgr_uuid
+    print(mgr_uuid)
 
     protocol = SupportBundleFileTransferProtocol(
         name="SCP",

@@ -103,7 +103,7 @@ def main():
     default_dz = dz_svc.get(DEFAULT_DZ_ID)
 
     # Print the current enforcement points
-    print "Initial enforcement points: "
+    print("Initial enforcement points: ")
     pp.pprint(default_dz.enforcement_points)
 
     # Register an enforcement point
@@ -119,10 +119,10 @@ def main():
     )
 
     try:
-        ep_svc.patch(DEFAULT_DZ_ID, "example", ep)
+        ep_svc.update(DEFAULT_DZ_ID, "example", ep)
     except Error as ex:
         api_error = ex.data.convert_to(ApiError)
-        print "An error occurred: %s" % api_error.error_message
+        print("An error occurred: %s" % api_error.error_message)
 
     eps = ep_svc.list(DEFAULT_DZ_ID)
     pp.pprint(eps)
