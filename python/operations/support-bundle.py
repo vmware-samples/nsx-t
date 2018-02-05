@@ -24,19 +24,6 @@ from com.vmware.nsx.cluster_client import Nodes
 from vmware.vapi.bindings.struct import PrettyPrinter
 
 """
-* *******************************************************
-* Copyright (c) VMware, Inc. 2017. All Rights Reserved.
-* SPDX-License-Identifier: MIT
-* *******************************************************
-*
-* DISCLAIMER. THIS PROGRAM IS PROVIDED TO YOU "AS IS" WITHOUT
-* WARRANTIES OR CONDITIONS OF ANY KIND, WHETHER ORAL OR WRITTEN,
-* EXPRESS OR IMPLIED. THE AUTHOR SPECIFICALLY DISCLAIMS ANY IMPLIED
-* WARRANTIES OR CONDITIONS OF MERCHANTABILITY, SATISFACTORY QUALITY,
-* NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE.
-"""
-
-"""
 This example shows how to collect a support bundle and
 send it to a remote file server using scp.
 
