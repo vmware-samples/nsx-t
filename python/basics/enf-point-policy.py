@@ -119,7 +119,7 @@ def main():
     )
 
     try:
-        ep_svc.update(DEFAULT_DZ_ID, "example", ep)
+        ep_svc.patch(DEFAULT_DZ_ID, "example", ep)
     except Error as ex:
         api_error = ex.data.convert_to(ApiError)
         print("An error occurred: %s" % api_error.error_message)

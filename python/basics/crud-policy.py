@@ -43,9 +43,12 @@ import random
 import sys
 from util import auth
 from util import getargs
-from com.vmware.nsx_policy_client import Infra
+
 from com.vmware.nsx_policy.infra_client import Domains
+from com.vmware.nsx_policy.model_client import ApiError
 from com.vmware.nsx_policy.model_client import Domain
+from com.vmware.nsx_policy_client import Infra
+from com.vmware.vapi.std.errors_client import Error
 from com.vmware.vapi.std.errors_client import NotFound
 from vmware.vapi.bindings.struct import PrettyPrinter
 
@@ -104,8 +107,12 @@ def main():
         # now it must be provided on initial object creation.
         revision=0
     )
-    domains_svc.update(domain_id, domain)
-    print("Domain %s created." % domain_id)
+    try:
+        domains_svc.update(domain_id, domain)
+        print("Domain %s created." % domain_id)
+    except Error as ex:
+        api_error = ex.data.convert_to(ApiError)
+        print("An error occurred: %s" % api_error.error_message)
 
     # Read that domain
     read_domain = domains_svc.get(domain_id)
