@@ -1,27 +1,27 @@
 /*
  * NSX-T SDK Sample Code
- * 
+ *
  * Copyright 2017 VMware, Inc.  All rights reserved
- * 
+ *
  * The BSD-2 license (the "License") set forth below applies to all
  * parts of the NSX-T SDK Sample Code project.  You may not use this
  * file except in compliance with the License.
- * 
+ *
  * BSD-2 License
- * 
+ *
  * Redistribution and use in source and binary forms, with or
  * without modification, are permitted provided that the following
  * conditions are met:
- * 
+ *
  *     Redistributions of source code must retain the above
  *     copyright notice, this list of conditions and the
  *     following disclaimer.
- * 
+ *
  *     Redistributions in binary form must reproduce the above
  *     copyright notice, this list of conditions and the
  *     following disclaimer in the documentation and/or other
  *     materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
@@ -87,7 +87,7 @@ public class Crud {
 
         // First, list all transport zones. If your NSX installation has
         // just been installed, this should return an empty list.
-        TransportZoneListResult zones = zoneService.list(null, null, null, null, null);
+        TransportZoneListResult zones = zoneService.list(null, null, null, null, null, null);
         System.out.println("Initial list of transport zones - " + zones.getResultCount() + " zones");
         System.out.println(zones);
 
@@ -112,7 +112,7 @@ public class Crud {
 
         // List all transport zones again. The newly created transport
         // zone will be in the list.
-        zones = zoneService.list(null, null, null, null, null);
+        zones = zoneService.list(null, null, null, null, null, null);
         System.out.println("Updated list of transport zones - " + zones.getResultCount() + " zones");
         System.out.println(zones);
 
