@@ -1,0 +1,282 @@
+## NSX-T Creation of LS + Tier-1 + NSGroup + LB (LBS + VIP + Pool) + DFW (Section + Rule)
+## Author: Dimitri Desmidt
+## version 1.0
+## April 2018
+
+###
+# This Python Script creates 
+#	N+M Tier-1 (each connected to the same Tier-0)
+#	N+M LS (each connected to 1 Tier-1)
+#	N+M NSGroups (with specific LS in each)
+#	N+M DFW sections
+#	N+M DFW rules (each in a dedicated section)
+#	M LB (attached to 100 Tier-1)
+#	M VIP (each in a dedicated LB)
+#	M Pools (each in a dedicated VIP)
+# "N" = # of LS + LR + NSGroup + LB + DFW
+# "M" = # of LS + LR + NSGroup + DFW
+# Attention: If scale is high (especially for LB) NSX-T Edge Node Baremetal might be required
+###
+
+
+import requests
+import json
+import datetime
+from pyVmomi import vim
+from pyVim.connect import SmartConnect, Disconnect
+import vmutils
+import ssl
+
+# NSX-T information
+manager_ip="10.114.213.8"
+login="admin"
+password="VMware1!"
+tz_name="TZ-Overlay"
+edge_cluster_name="EdgeBM-ClusterAA(Dimi)"
+t0_name="Tier0-AA(EdgeBM_Dimi)"
+number_iterations_with_lb = 1
+number_iterations_without_lb = 1
+
+
+######################################################################################################
+# Don't change things below
+######################################################################################################
+
+start_time= datetime.datetime.now()
+
+#remove the self certificate warnings
+requests.packages.urllib3.disable_warnings()
+
+# headers for NSX-T Restful API calls
+headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
+
+def nsxt_get_call (mgr, uri):
+	response = requests.get('https://'+mgr+uri, verify=False, auth=(login, password), headers=headers, stream=True)
+	if "20" not in str(response.status_code):
+		print "GET uri " + uri + " response status code: "+str(response.status_code)
+		print response.text
+	#As the answer is in JSON format, create the proper object
+	json_response=json.loads(response.text)
+	return json_response
+
+def nsxt_find_call (mgr, uri, name):
+	json_response = nsxt_get_call (mgr, uri)
+	rerun = 'true'
+	object_list = []
+	# Create list of elements to find
+	while (rerun == 'true' and len(json_response['results']) > 0):
+		for result in (json_response['results']):
+			if name in result['display_name']:
+				object_list.append(result)
+		if ('cursor' in json_response):
+			json_response = nsxt_get_call (mgr, uri,cursor=json_response['cursor'])
+		else:
+			rerun = 'false'
+	return object_list
+
+	
+def nsxt_post_call (mgr, uri, payload):
+	response = requests.post('https://'+mgr+uri, verify=False, auth=(login, password), headers=headers, stream=True, data=json.dumps(payload))
+	if "20" not in str(response.status_code):
+		print "POST uri " + uri + " response status code: "+str(response.status_code)
+		print response.text
+	#As the answer is in JSON format, create the proper object
+	json_response=json.loads(response.text)
+	return json_response
+
+
+######
+#GET TZ Overlay UUID
+######
+print "Getting TZ Overlay UUID"
+tz = nsxt_find_call (manager_ip, '/api/v1/transport-zones', tz_name)
+tz_id = tz[0]['id']
+print "TZ_id = "+tz_id
+
+		
+######
+#Create LR "Python_LR" connected to LS "Python_LS"
+######
+print "=== Creating LR + LS + NSGroup + LB + DFW"
+
+for i in range(1, (1+number_iterations_with_lb)):
+	###
+	#Create LS
+	###
+	ls_name = 'Python_LS'+ str(i)
+	payload ={'transport_zone_id': tz_id.encode('ascii','ignore'), 'replication_mode': 'MTEP', 'admin_state': 'UP', 'display_name': ls_name}
+	json_response = nsxt_post_call(manager_ip, '/api/v1/logical-switches', payload)
+	ls_id = json_response['id']
+	
+	###
+	#Create LS-Port
+	###
+	payload ={'logical_switch_id': ls_id.encode('ascii','ignore'), 'admin_state': 'UP', 'description': 'LR-port'}
+	json_response = nsxt_post_call(manager_ip,'/api/v1/logical-ports', payload)
+	lsport_id = json_response['id']
+	
+	###
+	#Create LR + LR-Port
+	###
+	#Create LR
+	t1_name = 'Python_LR'+ str(i)+'(LB)'
+	edge_cluster = nsxt_find_call (manager_ip, '/api/v1/edge-clusters', edge_cluster_name)
+	edge_cluster_id = edge_cluster[0]['id']
+	payload ={'resource_type': 'LogicalRouter', 'display_name': t1_name, 'router_type': 'TIER1', 'edge_cluster_id': edge_cluster_id}
+	json_response = nsxt_post_call(manager_ip, '/api/v1/logical-routers', payload)
+	t1_id = json_response['id']
+	
+	#Create LR-Port-Downlink
+	payload ={'resource_type': 'LogicalRouterDownLinkPort', 'logical_router_id': t1_id, \
+		'linked_logical_switch_port_id': {'target_type': 'LogicalPort', 'target_id': lsport_id}, 'subnets': [{'ip_addresses': ['172.16.40.1'], 'prefix_length': '24'}]}
+	json_response = nsxt_post_call(manager_ip, '/api/v1/logical-router-ports', payload)
+
+	#Create Tier-0 LR-Port unplugged
+	t0 = nsxt_find_call (manager_ip, '/api/v1/logical-routers', t0_name)
+	t0_id = t0[0]['id']
+	payload ={'resource_type': 'LogicalRouterLinkPortOnTIER0', 'logical_router_id': t0_id}
+	json_response = nsxt_post_call(manager_ip, '/api/v1/logical-router-ports', payload)
+	t0_lrport_id = json_response['id']
+
+	#Attach Tier-0 LR-Port to Tier-1
+	payload ={'resource_type': 'LogicalRouterLinkPortOnTIER1', 'logical_router_id': t1_id, 'linked_logical_router_port_id': {'target_id': t0_lrport_id}}
+	json_response = nsxt_post_call(manager_ip, '/api/v1/logical-router-ports', payload)
+
+	
+	###
+	#Create LB + NSGroup + Pool + VIP
+	###
+	#Create NSGroup
+	nsgroup_name = 'Python_NSGroup'+ str(i)
+	payload ={'display_name': nsgroup_name, 'members': [{'resource_type': 'NSGroupSimpleExpression', 'op': 'EQUALS', \
+		'target_resource': {'is_valid': 'true'},'target_type': 'LogicalSwitch', 'value': ls_id, 'target_property': 'id'}],}
+	json_response = nsxt_post_call(manager_ip, '/api/v1/ns-groups', payload)
+	nsgroup_id = json_response['id']
+	
+	#Create LB_Pool
+	lbpool_name = 'Python_Pool'+ str(i)
+	payload ={'member_group': {'grouping_object': {'target_type': 'NSGroup', 'target_id': nsgroup_id }, 'max_ip_list_size': 0}, 'display_name': lbpool_name}
+	json_response = nsxt_post_call(manager_ip, '/api/v1/loadbalancer/pools', payload)
+	lbpool_id = json_response['id']
+	
+	#Create LB_VS
+	lbvs_name = 'Python_VS'+ str(i)
+
+	app_profile = nsxt_find_call (manager_ip, '/api/v1/loadbalancer/application-profiles', 'nsx-default-lb-http-profile')
+	app_profile_id = app_profile[0]['id']
+	
+	payload ={'pool_id': lbpool_id, 'default_pool_member_port' : '80', 'application_profile_id': app_profile_id, \
+		'ip_address': '123.123.123.123', 'port': '80', 'display_name': lbvs_name}
+	json_response = nsxt_post_call(manager_ip, '/api/v1/loadbalancer/virtual-servers', payload)
+	lbvs_id = json_response['id']
+	
+	#Create LB
+	lb_name = 'Python_LB'+ str(i)
+	payload ={'attachment': {'target_type': 'LogicalRouter', 'target_id': t1_id}, 'display_name': lb_name, 'size': 'SMALL', 'virtual_server_ids': [lbvs_id],}
+	json_response = nsxt_post_call(manager_ip, '/api/v1/loadbalancer/services', payload)
+
+	
+	###
+	#Create DFW Section + Rule
+	###
+	#Create DFW section
+	dfwsection_name = 'Python_Section'+ str(i)
+	payload ={'display_name': dfwsection_name, 'section_type': 'LAYER3', 'stateful': 'true'}
+	json_response = nsxt_post_call(manager_ip, '/api/v1/firewall/sections', payload)
+	dfwsection_id = json_response['id']
+
+	#Create DFW rule
+	dfwrule_name = 'Python_Rule1'
+	payload ={'display_name': dfwrule_name, 'sources': [{'target_type': 'IPv4Address', 'target_id': '123.123.123.123'}], 'ip_protocol': 'IPV4', 'action': 'ALLOW', \
+		'applied_tos': [{'target_type': 'LogicalSwitch', 'target_id': ls_id}]}
+	json_response = nsxt_post_call(manager_ip, '/api/v1/firewall/sections/'+dfwsection_id+'/rules', payload)
+
+
+	
+	print 'created LS + LR + NSGroup + LB + DFW #' + str(i)
+
+
+
+for i in range(number_iterations_with_lb+1, (number_iterations_with_lb+1+number_iterations_without_lb)):
+	###
+	#Create LS
+	###
+	ls_name = 'Python_LS'+ str(i)
+	payload ={'transport_zone_id': tz_id.encode('ascii','ignore'), 'replication_mode': 'MTEP', 'admin_state': 'UP', 'display_name': ls_name}
+	json_response = nsxt_post_call(manager_ip, '/api/v1/logical-switches', payload)
+	ls_id = json_response['id']
+	
+	###
+	#Create LS-Port
+	###
+	payload ={'logical_switch_id': ls_id.encode('ascii','ignore'), 'admin_state': 'UP', 'description': 'LR-port'}
+	json_response = nsxt_post_call(manager_ip,'/api/v1/logical-ports', payload)
+	lsport_id = json_response['id']
+	
+	###
+	#Create LR + LR-Port
+	###
+	#Create LR
+	t1_name = 'Python_LR'+ str(i)
+	edge_cluster = nsxt_find_call (manager_ip, '/api/v1/edge-clusters', edge_cluster_name)
+	edge_cluster_id = edge_cluster[0]['id']
+	payload ={'resource_type': 'LogicalRouter', 'display_name': t1_name, 'router_type': 'TIER1', 'edge_cluster_id': edge_cluster_id}
+	json_response = nsxt_post_call(manager_ip, '/api/v1/logical-routers', payload)
+	t1_id = json_response['id']
+	
+	#Create LR-Port-Downlink
+	payload ={'resource_type': 'LogicalRouterDownLinkPort', 'logical_router_id': t1_id, \
+		'linked_logical_switch_port_id': {'target_type': 'LogicalPort', 'target_id': lsport_id}, 'subnets': [{'ip_addresses': ['172.16.40.1'], 'prefix_length': '24'}]}
+	json_response = nsxt_post_call(manager_ip, '/api/v1/logical-router-ports', payload)
+
+	#Create Tierr-0 LR-Port unplugged
+	t0 = nsxt_find_call (manager_ip, '/api/v1/logical-routers', t0_name)
+	t0_id = t0[0]['id']
+	payload ={'resource_type': 'LogicalRouterLinkPortOnTIER0', 'logical_router_id': t0_id}
+	json_response = nsxt_post_call(manager_ip, '/api/v1/logical-router-ports', payload)
+	t0_lrport_id = json_response['id']
+
+	#Attach to Tier-1 to Tier-0 LR-Port
+	payload ={'resource_type': 'LogicalRouterLinkPortOnTIER1', 'logical_router_id': t1_id, 'linked_logical_router_port_id': {'target_id': t0_lrport_id}}
+	json_response = nsxt_post_call(manager_ip, '/api/v1/logical-router-ports', payload)
+
+	
+	###
+	#Create NSGroup
+	###
+	#Create NSGroup
+	nsgroup_name = 'Python_NSGroup'+ str(i)
+	payload ={'display_name': nsgroup_name, 'members': [{'resource_type': 'NSGroupSimpleExpression', 'op': 'EQUALS', \
+		'target_resource': {'is_valid': 'true'},'target_type': 'LogicalSwitch', 'value': ls_id, 'target_property': 'id'}],}
+	json_response = nsxt_post_call(manager_ip, '/api/v1/ns-groups', payload)
+	nsgroup_id = json_response['id']
+	
+	
+	###
+	#Create DFW Section + Rule
+	###
+	#Create DFW section
+	dfwsection_name = 'Python_Section'+ str(i)
+	payload ={'display_name': dfwsection_name, 'section_type': 'LAYER3', 'stateful': 'true'}
+	json_response = nsxt_post_call(manager_ip, '/api/v1/firewall/sections', payload)
+	dfwsection_id = json_response['id']
+
+	#Create DFW rule
+	dfwrule_name = 'Python_Rule1'
+	payload ={'display_name': dfwrule_name, 'sources': [{'target_type': 'IPv4Address', 'target_id': '123.123.123.123'}], 'ip_protocol': 'IPV4', 'action': 'ALLOW', \
+		'applied_tos': [{'target_type': 'LogicalSwitch', 'target_id': ls_id}]}
+	json_response = nsxt_post_call(manager_ip, '/api/v1/firewall/sections/'+dfwsection_id+'/rules', payload)
+
+
+
+	print 'created LS + LR + NSGroup + DFW #' + str(i)
+
+
+
+	
+end_time= datetime.datetime.now()
+
+print 'script started at ' + start_time.strftime("%Y-%m-%d %H:%M:%S")
+print 'script ended at ' + end_time.strftime("%Y-%m-%d %H:%M:%S")
+total_time = end_time - start_time
+print 'total time '+str(total_time).split(".")[0]
