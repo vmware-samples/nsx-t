@@ -1,0 +1,151 @@
+## NSX-T Creation of LS + Tier-1 + NSGroup + LB (LBS + VIP + Pool) + DFW (Section + Rule)
+## Author: Dimitri Desmidt
+## version 1.0
+## April 2018
+
+###
+# This Python Script deletes the Python objects created by the script "Create_LS_LR_NSGroup_LB_DFW" 
+# Note: It actually deletes all those objects with name "Python*"
+###
+
+
+import requests
+import json
+import datetime
+
+#remove the self certificate warnings
+requests.packages.urllib3.disable_warnings()
+
+manager_ip="10.114.213.8"
+login="admin"
+password="VMware1!"
+
+headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
+
+tz_name="TZ-Overlay"
+t0_name="Tier0-AA(EdgeBM_Dimi)"
+
+
+######################################################################################################
+# Don't change things below
+######################################################################################################
+
+start_time= datetime.datetime.now()
+
+
+def nsxt_get_call (mgr, uri,cursor=''):
+	response = requests.get('https://'+mgr+uri+'?cursor='+cursor, verify=False, auth=(login, password), headers=headers, stream=True)
+	if "20" not in str(response.status_code):
+		print 'GET uri ' + uri + ' response status code: '+str(response.status_code)
+		print response.text
+	#As the answer is in JSON format, create the proper object
+	json_response=json.loads(response.text)
+	return json_response
+	
+def nsxt_find_call (mgr, uri, name):
+	json_response = nsxt_get_call (mgr, uri)
+	rerun = 'true'
+	object_list = []
+	# Create list of elements to find
+	while (rerun == 'true' and len(json_response['results']) > 0):
+		for result in (json_response['results']):
+			if name in result['display_name']:
+				object_list.append(result)
+		if ('cursor' in json_response):
+			json_response = nsxt_get_call (mgr, uri,cursor=json_response['cursor'])
+		else:
+			rerun = 'false'
+	return object_list
+
+def nsxt_delete_call (mgr, uri_get, uri_delete, name, url_delete_option=''):
+	print 'Get the list of objects \"' + str(uri_get) + '\" to delete'
+	delete_list = nsxt_find_call (mgr, uri_get, name)
+	# Delete elements
+	for object in (delete_list):
+		response = requests.delete('https://'+mgr+uri_delete+object['id']+url_delete_option, verify=False, auth=(login, password), stream=True)
+		if "20" not in str(response.status_code):
+			print 'DELETE uri ' + uri + ' response status code: '+str(response.status_code)
+			print response.text
+		print '   delete : '+object['display_name']
+	return
+
+
+def nsxt_delete_lr_ports__unplugged_call (mgr, lr_name):
+	t0 = nsxt_find_call (mgr, '/api/v1/logical-routers', lr_name)
+	t0_id = t0[0]['id']
+	
+	json_response = nsxt_get_call (mgr, '/api/v1/logical-router-ports')
+	rerun = 'true'
+	object_list = []
+	# Create list of elements to find
+	while (rerun == 'true' and len(json_response['results']) > 0):
+		for result in (json_response['results']):
+			if (t0_id == result['logical_router_id']) and ('linked_logical_router_port_id' not in result) and ('LogicalRouterLinkPortOnTIER0' == result['resource_type']):
+					response = requests.delete('https://'+mgr+'/api/v1/logical-router-ports/'+result['id'], verify=False, auth=(login, password), stream=True)
+					print '   delete Tier-0 linked ports to Tier-1'
+		if ('cursor' in json_response):
+			json_response = nsxt_get_call (mgr, uri,cursor=json_response['cursor'])
+		else:
+			rerun = 'false'
+	return
+
+	
+######
+#GET TZ Overlay UUID
+######
+print "Getting TZ Overlay UUID"
+tz = nsxt_find_call (manager_ip, '/api/v1/transport-zones', tz_name)
+tz_id = tz[0]['id']
+print "TZ_id = "+tz_id
+
+######
+#DELETE LR "Python_LR" + "Python_LS"
+######
+print "=== Delete LB + LR + LS + DFW Python"
+
+###
+# Delete the LB_VS + LB_Pool + NSGroup + LBS
+###
+#Delete all LBS Python
+nsxt_delete_call (manager_ip, '/api/v1/loadbalancer/services', '/api/v1/loadbalancer/services/', 'Python_LB')
+
+#Delete all LB_VS Python
+nsxt_delete_call (manager_ip, '/api/v1/loadbalancer/virtual-servers', '/api/v1/loadbalancer/virtual-servers/', 'Python_VS')
+
+#Delete all LB_Pool Python
+nsxt_delete_call (manager_ip, '/api/v1/loadbalancer/pools', '/api/v1/loadbalancer/pools/', 'Python_Pool')
+
+#Delete all NSGroup Python
+nsxt_delete_call (manager_ip, '/api/v1/ns-groups', '/api/v1/ns-groups/', 'Python_NSGroup', url_delete_option='?force=true')
+
+
+
+###
+# Delete the LR
+###
+#Delete all LR Python
+nsxt_delete_call (manager_ip, '/api/v1/logical-routers', '/api/v1/logical-routers/', 'Python_LR', url_delete_option='?force=true')
+#Delete Tier0 LR Ports unattached
+t0 = nsxt_delete_lr_ports__unplugged_call (manager_ip, t0_name)
+
+
+###
+# Delete the LS
+###
+#Delete all LS Python
+nsxt_delete_call (manager_ip, '/api/v1/logical-switches', '/api/v1/logical-switches/', 'Python_LS', url_delete_option='?detach=true&cascade=true')
+	
+
+###
+# Delete the DFW
+###
+#Delete all DFW Section Python
+nsxt_delete_call (manager_ip, '/api/v1/firewall/sections', '/api/v1/firewall/sections/', 'Python_Section', url_delete_option='?cascade=true')
+
+
+end_time= datetime.datetime.now()
+
+print 'script started at ' + start_time.strftime("%Y-%m-%d %H:%M:%S")
+print 'script ended at ' + end_time.strftime("%Y-%m-%d %H:%M:%S")
+total_time = end_time - start_time
+print 'total time '+str(total_time).split(".")[0]
