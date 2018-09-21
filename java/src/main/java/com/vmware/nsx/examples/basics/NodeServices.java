@@ -1,27 +1,27 @@
 /*
  * NSX-T SDK Sample Code
- * 
+ *
  * Copyright 2017 VMware, Inc.  All rights reserved
- * 
+ *
  * The BSD-2 license (the "License") set forth below applies to all
  * parts of the NSX-T SDK Sample Code project.  You may not use this
  * file except in compliance with the License.
- * 
+ *
  * BSD-2 License
- * 
+ *
  * Redistribution and use in source and binary forms, with or
  * without modification, are permitted provided that the following
  * conditions are met:
- * 
+ *
  *     Redistributions of source code must retain the above
  *     copyright notice, this list of conditions and the
  *     following disclaimer.
- * 
+ *
  *     Redistributions in binary form must reproduce the above
  *     copyright notice, this list of conditions and the
  *     following disclaimer in the documentation and/or other
  *     materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
  * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
@@ -39,19 +39,33 @@
 
 package com.vmware.nsx.examples.basics;
 
+import java.util.List;
+
 import org.apache.commons.cli.CommandLine;
 
 import com.vmware.nsx.examples.util.ApiClientUtils;
 import com.vmware.nsx.examples.util.CliUtils;
 import com.vmware.nsx.model.NodeHttpServiceProperties;
+import com.vmware.nsx.model.NodeServiceProperties;
+import com.vmware.nsx.model.NodeServicePropertiesListResult;
+import com.vmware.nsx.model.NodeServiceStatusProperties;
+import com.vmware.nsx.node.Services;
 import com.vmware.nsx.node.services.Http;
+import com.vmware.nsx.node.services.http.Status;
 import com.vmware.vapi.client.ApiClient;
 
 /*-
- * This example shows how to restart the http service on
- * a manager node.
+ * This example shows how to list all of the services
+ * that exist on an NSX manager node, how to retrieve the
+ * configuration and status of a single service, and how
+ * to restart a service. In this example, the http service
+ * is restarted. This service processes incoming API
+ * requests.
+ *
+ * Note that while the http service is restarting, the
+ * manager is unable to process API requests.
  */
-public class Restart {
+public class NodeServices {
 
     public static void main(String[] args) {
         CommandLine cmd = CliUtils.parseArgs(args);
@@ -61,12 +75,25 @@ public class Restart {
                 cmd.getOptionValue("user"),
                 cmd.getOptionValue("password").toCharArray());
 
-        // Create the Http service we'll need.
+        // Create the services we'll need.
+        Services nodeServices = apiClient.createStub(Services.class);
         Http httpService = apiClient.createStub(Http.class);
+        Status httpServiceStatus = apiClient.createStub(Status.class);
 
-        // First, retrieve the http service configuration
+        // List all the services
+        NodeServicePropertiesListResult servicesListResult = nodeServices.list();
+        List<NodeServiceProperties> services = servicesListResult.getResults();
+        for (NodeServiceProperties serviceProperties: services) {
+            System.out.println("Service name: " + serviceProperties.getServiceName());
+        }
+
+        // Retrieve the http service configuration
         NodeHttpServiceProperties httpProps = httpService.get();
         System.out.println(httpProps);
+
+        // Retrieve the http service's status
+        NodeServiceStatusProperties serviceStatus = httpServiceStatus.get();
+        System.out.println(serviceStatus);
 
         // Now restart the service.
         httpService.restart();

@@ -1,6 +1,6 @@
 NSX-T SDK Sample Code
 
-Copyright 2017 VMware, Inc.  All rights reserved
+Copyright 2018 VMware, Inc.  All rights reserved
 
 The BSD-2 license (the "License") set forth below applies to all
 parts of the NSX-T SDK Sample Code project.  You may not use this
@@ -102,42 +102,58 @@ demo's Main method.
 
 Each sample takes the following command-line arguments:
 
-     -c,--cert_trust_store <arg>   Certificate trust store (optional, defaults  
-                                   to crypto/manager.jks)  
-     -h,--help                     Get help  
-     -n,--nsx_host <arg>           NSX host to connect to  
-     -p,--password <arg>           Password  
-     -t,--tcp_port <arg>           TCP port for NSX server (optional, defaults  
-                                   to 443)  
-     -u,--user <arg>               User to authenticate as  
+     -c,--cert_trust_store <arg>   Certificate trust store (optional, defaults
+                                   to crypto/manager.jks)
+     -h,--help                     Get help
+     -n,--nsx_host <arg>           NSX host to connect to
+     -p,--password <arg>           Password
+     -t,--tcp_port <arg>           TCP port for NSX server (optional, defaults
+                                   to 443)
+     -u,--user <arg>               User to authenticate as
 
 The following samples are currently available:
 
-**com.vmware.nsx.examples.basics.Crud**  
+**com.vmware.nsx.examples.basics.Crud**
 A basic demo showing how to perform create, read, update, delete,
 and list operations using the NSX-T REST API.
 
-**com.vmware.nsx.examples.basics.FabricNodes**  
+**com.vmware.nsx.examples.basics.ErrorHandling**
+Shows how to detect API errors and obtain detailed
+information for the cause of the API error.
+
+**com.vmware.nsx.examples.basics.FabricNodes**
 Shows how to retrieve information on fabric nodes and their
 current status. In order for this example to produce any output,
 you must configure at least one fabric node.
 
-**com.vmware.nsx.examples.basics.L3Demo**  
+**com.vmware.nsx.examples.basics.L3Demo**
 A demonstration of layer 3 routing. This demo creates two logical
 switches, attaches the switches via a logical router, then sets
 a firewall policy that blocks all traffic except on ports used
 by Microsoft SQL Server.
 
-**com.vmware.nsx.examples.basics.Tagging**  
+**com.vmware.nsx.examples.basics.NodeServices**
+Shows how to list the various services that run on an NSX manager
+node, how to retrieve their configuration and status, and
+how to restart them.
+
+**com.vmware.nsx.examples.basics.Tagging**
 Shows how to set tags (arbitrary user-supplied metadata) on
 NSX resources.
 
-**com.vmware.nsx.examples.operations.LogicalStats**  
+**com.vmware.nsx.examples.basics.Vmc**
+Shows how to authenticate to NSX in VMware Cloud on AWS (VMC).
+To authenticate, you provide your VMC organization ID,
+the Software Defined Data Center (SDDC) ID, and your
+VMC refresh token. The SDK then obtains and uses an
+authentication token, refreshing it as needed.
+
+**com.vmware.nsx.examples.operations.LogicalStats**
 Shows how to retrieve status and statistics for NSX logical
 entities like Logical Ports, Logical Router Ports,  and Logical
 Switches.
 
-**com.vmware.nsx.examples.operations.PhysicalStats**  
+**com.vmware.nsx.examples.operations.PhysicalStats**
 Shows how to retrieve status and statistics for the physical
 underlay of NSX, like the physical interfaces of Transport
 Nodes. In order for this example to produce any output, you
