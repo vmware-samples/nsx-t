@@ -13,18 +13,8 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <VAPI_VERSION>2.9.0</VAPI_VERSION>
-    <NSX_JAVA_SDK_VERSION>2.2.0.0.0.14290118</NSX_JAVA_SDK_VERSION>
+    <NSX_JAVA_SDK_VERSION>2.2.0.0.0.8680797</NSX_JAVA_SDK_VERSION>
   </properties>
-
-<!--
-  <repositories>
-    <repository>
-      <id>local-repo</id>
-      <name>repo</name>
-      <url>file://${project.basedir}/repo</url>
-    </repository>
-  </repositories>
--->
 
   <dependencies>
     <dependency>
@@ -77,12 +67,12 @@
     <dependency>
       <groupId>com.vmware.vapi</groupId>
       <artifactId>vapi-runtime</artifactId>
-      <version>2.7.0</version>
+      <version>${VAPI_VERSION}</version>
     </dependency>
     <dependency>
       <groupId>com.vmware.vapi</groupId>
       <artifactId>vapi-authentication</artifactId>
-      <version>2.7.0</version>
+      <version>${VAPI_VERSION}</version>
     </dependency>
     <dependency>
       <groupId>com.vmware</groupId>

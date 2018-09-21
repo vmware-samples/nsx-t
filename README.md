@@ -23,9 +23,11 @@ Follow the steps in the java/README.md or python/README.md files.
 ## Releases & Major Branches
 
 The API samples have been tested with NSX-T version 2.1. As new
-releases of NSX-T become available, samples that use features
-only found in newer NSX-T releases will include a notice in the
-source code describing which release(s) they are compatible with.
+releases of NSX-T become available, additional samples will be
+developed and a new git tag will be created indicating the NSX-T
+release associated with the samples. You can use
+"git checkout tag-name" to pull an older release of the samples
+if you need to.
 
 ## Contributing
 

@@ -3,7 +3,7 @@ Sample code for VMware NSX-T Python SDK
 
 NSX-T SDK Sample Code
 
-Copyright 2017 VMware, Inc.  All rights reserved
+Copyright 2018 VMware, Inc.  All rights reserved
 
 The BSD-2 license (the "License") set forth below applies to all
 parts of the NSX-T SDK Sample Code project.  You may not use this
@@ -71,10 +71,16 @@ To install the SDK and its dependencies, issue the following commands:
     source venv/bin/activate
 
     # 3) Copy the NSX-T SDKs and vapi runtime:
-    # For NSX-T 2.1, navigate to the VMware{code} website python SDK
+    # For NSX-T 2.2, navigate to the VMware{code} website python SDK
     # site at https://code.vmware.com/sdks and follow the
     # VMware NSX-T for Python link.
     # Copy all SDK files to the lib directory in this repo.
+    # The complete list of files needed are:
+    # nsx_python_sdk-2.2.0.0.0.8680797-doc.zip
+    # nsx_python_sdk-2.2.0.0.0.8680797-py2.py3-none-any.whl
+    # vapi_common-2.9.0-py2.py3-none-any.whl
+    # vapi_common_client-2.9.0-py2.py3-none-any.whl
+    # vapi_runtime-2.9.0-py2.py3-none-any.whl
 
     # 4) install the NSX-T SDK, and the vapi runtime
     pip install lib/*.whl
@@ -88,8 +94,7 @@ the current directory to your PYTHONPATH:
     export PYTHONPATH=`pwd`
 
 To run the samples, you need to have a working NSX-T manager
-installed. To run the NSX policy SDK examples, you will need
-to have a working NSX-T Policy appliance running.
+installed.
 
 Running the samples
 -------------------
