@@ -103,9 +103,6 @@ def main():
     domain = Domain(
         id=domain_id,
         display_name=domain_id,
-        # Note: the revision should not be required, but for
-        # now it must be provided on initial object creation.
-        revision=0
     )
     try:
         domains_svc.update(domain_id, domain)
