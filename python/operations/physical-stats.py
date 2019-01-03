@@ -3,7 +3,7 @@
 """
 NSX-T SDK Sample Code
 
-Copyright 2017 VMware, Inc.  All rights reserved
+Copyright 2017-2019 VMware, Inc.  All rights reserved
 
 The BSD-2 license (the "License") set forth below applies to all
 parts of the NSX-T SDK Sample Code project.  You may not use this
@@ -39,20 +39,16 @@ ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 
+import time
+
+from com.vmware.nsx.model_client import EdgeNode
+from com.vmware.nsx.model_client import HostNode
+from com.vmware.nsx.model_client import Node
 from com.vmware.vapi.std.errors_client import NotFound
 from util import auth
 from util import getargs
 from vmware.vapi.bindings.struct import PrettyPrinter
 
-import time
-
-from com.vmware.nsx.fabric import nodes_client
-from com.vmware.nsx.fabric.nodes import network_client
-from com.vmware.nsx.fabric.nodes.network import interfaces_client
-from com.vmware.nsx import fabric_client
-from com.vmware.nsx.model_client import EdgeNode
-from com.vmware.nsx.model_client import HostNode
-from com.vmware.nsx.model_client import Node
 
 """
 This example shows how to get statistics and counters for the fabric
@@ -125,18 +121,13 @@ pp = PrettyPrinter()
 
 def main():
     args = getargs.getargs()
-    stub_config = auth.get_session_auth_stub_config(args.user, args.password,
-                                                    args.nsx_host,
-                                                    args.tcp_port)
-    # Instantiate all the services we'll need.
-    fn_svc = fabric_client.Nodes(stub_config)
-    fnstatus_svc = nodes_client.Status(stub_config)
-    interfaces_svc = network_client.Interfaces(stub_config)
-    interface_stats_svc = interfaces_client.Stats(stub_config)
+    api_client = auth.create_nsx_api_client(args.user, args.password,
+                                            args.nsx_host, args.tcp_port,
+                                            auth_type=auth.SESSION_AUTH)
 
     # Find all fabric nodes and print a summary of each node's
     # operational state
-    all_raw_fns = fn_svc.list()
+    all_raw_fns = api_client.fabric.Nodes.list()
     print("***** Showing summaries for %d fabric nodes" %
           all_raw_fns.result_count)
     all_fns = []
@@ -149,11 +140,13 @@ def main():
             all_fns.append(raw_fn.convert_to(EdgeNode))
     for fn in all_fns:
         print_node(fn)
-        print_node_status(fn, fnstatus_svc.get(fn.id, source="realtime"))
-        interfaces = interfaces_svc.list(fn.id)
+        print_node_status(
+            fn, api_client.fabric.nodes.Status.get(fn.id, source="realtime"))
+        interfaces = api_client.fabric.nodes.network.Interfaces.list(fn.id)
         print("    Interfaces:")
         for interface in interfaces.results:
-            if_stats = interface_stats_svc.get(fn.id, interface.interface_id)
+            if_stats = api_client.fabric.nodes.network.interfaces.Stats.get(
+                fn.id, interface.interface_id)
             print_interface_and_stats(fn, interface, if_stats)
         print("")
 
