@@ -3,7 +3,7 @@
 """
 NSX-T SDK Sample Code
 
-Copyright 2017 VMware, Inc.  All rights reserved
+Copyright 2017-2019 VMware, Inc.  All rights reserved
 
 The BSD-2 license (the "License") set forth below applies to all
 parts of the NSX-T SDK Sample Code project.  You may not use this
@@ -41,12 +41,6 @@ POSSIBILITY OF SUCH DAMAGE.
 
 import sys
 
-from com.vmware.nsx_client import LogicalPorts
-from com.vmware.nsx_client import LogicalRouterPorts
-from com.vmware.nsx_client import LogicalRouters
-from com.vmware.nsx_client import LogicalSwitches
-from com.vmware.nsx_client import TransportZones
-from com.vmware.nsx.firewall_client import Sections
 from com.vmware.nsx.model_client import FirewallRule
 from com.vmware.nsx.model_client import FirewallSection
 from com.vmware.nsx.model_client import FirewallSectionRuleList
@@ -141,19 +135,11 @@ DELETE /api/v1/transport-zones/<zone-id>
 
 def main():
     args = getargs.getargs()
-    stub_config = auth.get_session_auth_stub_config(args.user, args.password,
-                                                    args.nsx_host,
-                                                    args.tcp_port)
 
+    api_client = auth.create_nsx_api_client(args.user, args.password,
+                                            args.nsx_host, args.tcp_port,
+                                            auth_type=auth.SESSION_AUTH)
     pp = PrettyPrinter()
-
-    # Instantiate all the services we'll need.
-    transportzones_svc = TransportZones(stub_config)
-    logicalswitches_svc = LogicalSwitches(stub_config)
-    logicalrouters_svc = LogicalRouters(stub_config)
-    logicalrouterports_svc = LogicalRouterPorts(stub_config)
-    logicalports_svc = LogicalPorts(stub_config)
-    fwsections_svc = Sections(stub_config)
 
     # Create a transport zone
     new_tz = TransportZone(
@@ -162,7 +148,7 @@ def main():
         description="Transport zone for two-tier app demo",
         host_switch_name="hostswitch"
     )
-    demo_tz = transportzones_svc.create(new_tz)
+    demo_tz = api_client.TransportZones.create(new_tz)
 
     # Create a logical switch for the db tier
     new_ls = LogicalSwitch(
@@ -171,7 +157,7 @@ def main():
         replication_mode=LogicalSwitch.REPLICATION_MODE_MTEP,
         display_name="ls-db",
     )
-    db_ls = logicalswitches_svc.create(new_ls)
+    db_ls = api_client.LogicalSwitches.create(new_ls)
 
     # Create a logical switch for the web tier
     new_ls = LogicalSwitch(
@@ -180,7 +166,7 @@ def main():
         replication_mode=LogicalSwitch.REPLICATION_MODE_MTEP,
         display_name="ls-web",
     )
-    web_ls = logicalswitches_svc.create(new_ls)
+    web_ls = api_client.LogicalSwitches.create(new_ls)
 
     # Create a logical router that will route traffic between
     # the web and db tiers
@@ -189,7 +175,7 @@ def main():
         display_name="lr-demo",
         failover_mode=LogicalRouter.FAILOVER_MODE_PREEMPTIVE
     )
-    lr = logicalrouters_svc.create(new_lr)
+    lr = api_client.LogicalRouters.create(new_lr)
 
     # Create a logical port on the db and web logical switches. We
     # will attach the logical router to those ports so that it can
@@ -200,7 +186,7 @@ def main():
         logical_switch_id=db_ls.id,
         display_name="dbTierUplinkToRouter"
     )
-    db_port_on_ls = logicalports_svc.create(new_lp)
+    db_port_on_ls = api_client.LogicalPorts.create(new_lp)
 
     # Logical port on the web logical switch
     new_lp = LogicalPort(
@@ -208,7 +194,7 @@ def main():
         logical_switch_id=web_ls.id,
         display_name="webTierUplinkToRouter"
     )
-    web_port_on_ls = logicalports_svc.create(new_lp)
+    web_port_on_ls = api_client.LogicalPorts.create(new_lp)
 
     # Populate a logical router downlink port payload and configure
     # the port with the CIDR 192.168.1.1/24. We will attach this
@@ -221,7 +207,7 @@ def main():
         logical_router_id=lr.id
     )
     # Create the downlink port
-    lr_port_for_db_tier = logicalrouterports_svc.create(new_lr_port)
+    lr_port_for_db_tier = api_client.LogicalRouterPorts.create(new_lr_port)
     # Convert to concrete type
     lr_port_for_db_tier = lr_port_for_db_tier.convert_to(
         LogicalRouterDownLinkPort)
@@ -237,7 +223,7 @@ def main():
         logical_router_id=lr.id
     )
     # Create the downlink port
-    lr_port_for_web_tier = logicalrouterports_svc.create(new_lr_port)
+    lr_port_for_web_tier = api_client.LogicalRouterPorts.create(new_lr_port)
     lr_port_for_web_tier = lr_port_for_web_tier.convert_to(
         LogicalRouterDownLinkPort)
 
@@ -297,12 +283,12 @@ def main():
         display_name="MSSQL Server",
         description="Only allow MSSQL server traffic"
     )
-    demo_section = fwsections_svc.createwithrules(
+    demo_section = api_client.firewall.Sections.createwithrules(
         rule_list, None, operation="insert_top")
 
     # Re-read the firewall section so that we are operating on up-to-date
     # data.
-    section = fwsections_svc.get(demo_section.id)
+    section = api_client.firewall.Sections.get(demo_section.id)
 
     # Make the firewall section apply to the db tier logical
     # switch. This enables the firewall policy on all logical
@@ -311,7 +297,7 @@ def main():
         ResourceReference(target_id=db_ls.id,
                           target_type="LogicalSwitch")
     ]
-    fwsections_svc.update(section.id, section)
+    api_client.firewall.Sections.update(section.id, section)
 
     print("At this point you may attach VMs for the db tier to the db")
     print("logical switch and VMs for the web tier to the web logical")
@@ -333,15 +319,15 @@ def main():
     print("Press enter to delete all resources created for this example.")
     sys.stdin.readline()
 
-    fwsections_svc.delete(section.id, cascade=True)
-    logicalrouterports_svc.delete(lr_port_for_web_tier.id)
-    logicalrouterports_svc.delete(lr_port_for_db_tier.id)
-    logicalports_svc.delete(web_port_on_ls.id)
-    logicalports_svc.delete(db_port_on_ls.id)
-    logicalrouters_svc.delete(lr.id)
-    logicalswitches_svc.delete(web_ls.id)
-    logicalswitches_svc.delete(db_ls.id)
-    transportzones_svc.delete(demo_tz.id)
+    api_client.firewall.Sections.delete(section.id, cascade=True)
+    api_client.LogicalRouterPorts.delete(lr_port_for_web_tier.id)
+    api_client.LogicalRouterPorts.delete(lr_port_for_db_tier.id)
+    api_client.LogicalPorts.delete(web_port_on_ls.id)
+    api_client.LogicalPorts.delete(db_port_on_ls.id)
+    api_client.LogicalRouters.delete(lr.id)
+    api_client.LogicalSwitches.delete(web_ls.id)
+    api_client.LogicalSwitches.delete(db_ls.id)
+    api_client.TransportZones.delete(demo_tz.id)
 
 if __name__ == "__main__":
     main()
