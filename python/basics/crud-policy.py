@@ -3,7 +3,7 @@
 """
 NSX-T SDK Sample Code
 
-Copyright 2017 VMware, Inc.  All rights reserved
+Copyright 2017-2019 VMware, Inc.  All rights reserved
 
 The BSD-2 license (the "License") set forth below applies to all
 parts of the NSX-T SDK Sample Code project.  You may not use this
@@ -44,7 +44,6 @@ import sys
 from util import auth
 from util import getargs
 
-from com.vmware.nsx_policy.infra_client import Domains
 from com.vmware.nsx_policy.model_client import ApiError
 from com.vmware.nsx_policy.model_client import Domain
 from com.vmware.nsx_policy_client import Infra
@@ -79,23 +78,20 @@ DELETE /policy/api/v1/infra/domains/<domain-id>
 
 def main():
     args = getargs.getargs()
-    stub_config = auth.get_basic_auth_stub_config(args.user, args.password,
-                                                  args.nsx_host,
-                                                  args.tcp_port)
+
+    api_client = auth.create_nsx_policy_api_client(
+        args.user, args.password, args.nsx_host, args.tcp_port,
+        auth_type=auth.SESSION_AUTH)
 
     # Create a pretty printer to make the output look nice.
     pp = PrettyPrinter()
 
-    # Create the services we'll need.
-    infra_svc = Infra(stub_config)
-    domains_svc = Domains(stub_config)
-
     # First, retrieve /infra and the domains in /infra. If your NSX
     # policy service has just been installed, there will be no domains.
-    infra = infra_svc.get()
+    infra = api_client.Infra.get()
     print("Initial state of /infra")
     pp.pprint(infra)
-    domains = domains_svc.list()
+    domains = api_client.infra.Domains.list()
     print("All domains: total of %d domains" % domains.result_count)
 
     # Create a domain with a random id
@@ -105,20 +101,20 @@ def main():
         display_name=domain_id,
     )
     try:
-        domains_svc.update(domain_id, domain)
+        api_client.infra.Domains.update(domain_id, domain)
         print("Domain %s created." % domain_id)
     except Error as ex:
         api_error = ex.data.convert_to(ApiError)
         print("An error occurred: %s" % api_error.error_message)
 
     # Read that domain
-    read_domain = domains_svc.get(domain_id)
+    read_domain = api_client.infra.Domains.get(domain_id)
     print("Re-read the domain")
     pp.pprint(read_domain)
 
     # List all domains again. The newly created domain
     # will be in the list.
-    domains = domains_svc.list()
+    domains = api_client.infra.Domains.list()
     print("All domains: total of %d domains" % domains.result_count)
 
     print("You can now examine the infra and domains in the")
@@ -129,22 +125,22 @@ def main():
     # so to update an existing resource, just call the create method
     # again, passing the properties you wish to update.
     read_domain.description = "Updated description for transport zone"
-    domains_svc.update(domain_id, read_domain)
+    api_client.infra.Domains.update(domain_id, read_domain)
 
     # Re-read the domain
-    read_domain = domains_svc.get(domain_id)
+    read_domain = api_client.infra.Domains.get(domain_id)
     print("Domain after updating")
     pp.pprint(read_domain)
 
     # Delete the domain
-    domains_svc.delete(domain_id)
+    api_client.infra.Domains.delete(domain_id)
     print("After deleting domain")
 
     # Now if we try to read the domain, we should get a
     # 404 Not Found error. This example also shows how you can
     # check for and handle specific errors from the NSX Policy API.
     try:
-        read_domain = domains_svc.get(domain_id)
+        read_domain = api_client.infra.Domains.get(domain_id)
     except NotFound:
         print("Domain is gone, as expected")
 
