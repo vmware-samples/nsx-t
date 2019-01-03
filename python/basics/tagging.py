@@ -3,7 +3,7 @@
 """
 NSX-T SDK Sample Code
 
-Copyright 2017 VMware, Inc.  All rights reserved
+Copyright 2017-2019 VMware, Inc.  All rights reserved
 
 The BSD-2 license (the "License") set forth below applies to all
 parts of the NSX-T SDK Sample Code project.  You may not use this
@@ -45,10 +45,6 @@ import time
 from util import auth
 from util import getargs
 
-from com.vmware.nsx_client import LogicalPorts
-from com.vmware.nsx_client import LogicalSwitches
-from com.vmware.nsx_client import NsGroups
-from com.vmware.nsx_client import TransportZones
 from com.vmware.nsx.model_client import LogicalPort
 from com.vmware.nsx.model_client import LogicalSwitch
 from com.vmware.nsx.model_client import NSGroup
@@ -56,7 +52,6 @@ from com.vmware.nsx.model_client import NSGroupExpression
 from com.vmware.nsx.model_client import NSGroupTagExpression
 from com.vmware.nsx.model_client import Tag
 from com.vmware.nsx.model_client import TransportZone
-from com.vmware.nsx.ns_groups_client import EffectiveLogicalPortMembers
 from com.vmware.vapi.std.errors_client import NotFound
 from vmware.vapi.bindings.struct import PrettyPrinter
 
@@ -133,19 +128,13 @@ def print_group_effective_members(group_name, group):
 
 def main():
     args = getargs.getargs()
-    stub_config = auth.get_session_auth_stub_config(args.user, args.password,
-                                                    args.nsx_host,
-                                                    args.tcp_port)
+
+    api_client = auth.create_nsx_api_client(args.user, args.password,
+                                            args.nsx_host, args.tcp_port,
+                                            auth_type=auth.SESSION_AUTH)
 
     # Create a pretty printer to make the output look nice.
     pp = PrettyPrinter()
-
-    # Create the services we'll need.
-    transportzones_svc = TransportZones(stub_config)
-    logicalswitches_svc = LogicalSwitches(stub_config)
-    logicalports_svc = LogicalPorts(stub_config)
-    nsgroups_svc = NsGroups(stub_config)
-    efflports_svc = EffectiveLogicalPortMembers(stub_config)
 
     # Create a transport zone and logical switch. We only
     # need these so we can create logical ports. They aren't
@@ -156,14 +145,14 @@ def main():
         description="Transport zone for tagging demo",
         host_switch_name="hostswitch"
     )
-    tz = transportzones_svc.create(tz)
+    tz = api_client.TransportZones.create(tz)
     ls = LogicalSwitch(
         transport_zone_id=tz.id,
         admin_state=LogicalSwitch.ADMIN_STATE_UP,
         replication_mode=LogicalSwitch.REPLICATION_MODE_MTEP,
         display_name="ls-tag-demo",
     )
-    ls = logicalswitches_svc.create(ls)
+    ls = api_client.LogicalSwitches.create(ls)
 
     # First, create a new group whose members are any logical
     # ports with a tag scope of "color" and tag value of "green"
@@ -181,7 +170,7 @@ def main():
             )
         ]
     )
-    green_group = nsgroups_svc.create(group)
+    green_group = api_client.NsGroups.create(group)
 
     # Now create another group for color:yellow logical ports.
     group = NSGroup(
@@ -198,15 +187,17 @@ def main():
             )
         ]
     )
-    yellow_group = nsgroups_svc.create(group)
+    yellow_group = api_client.NsGroups.create(group)
 
     # Now get the list of effective members (that is, logical ports
     # with color:green). There should be no effective members yet.
     print("Before creating any lports:")
-    print_group_effective_members("green group",
-                                  efflports_svc.list(green_group.id))
-    print_group_effective_members("yellow group",
-                                  efflports_svc.list(yellow_group.id))
+    print_group_effective_members(
+        "green group", api_client.ns_groups.EffectiveLogicalPortMembers.list(
+            green_group.id))
+    print_group_effective_members(
+        "yellow group", api_client.ns_groups.EffectiveLogicalPortMembers.list(
+            yellow_group.id))
     print("")
 
     # Create a logical port with color:green
@@ -218,7 +209,7 @@ def main():
             Tag(scope="color", tag="green")
         ]
     )
-    lport = logicalports_svc.create(lport)
+    lport = api_client.LogicalPorts.create(lport)
     print("Logical port for this test has id %s" % lport.id)
     print("")
 
@@ -229,16 +220,18 @@ def main():
     # Find the effective members of the green and yellow groups.
     # Notice that the logical port is in the green group.
     print("After creating green lport:")
-    print_group_effective_members("green group",
-                                  efflports_svc.list(green_group.id))
-    print_group_effective_members("yellow group",
-                                  efflports_svc.list(yellow_group.id))
+    print_group_effective_members(
+        "green group", api_client.ns_groups.EffectiveLogicalPortMembers.list(
+            green_group.id))
+    print_group_effective_members(
+        "yellow group", api_client.ns_groups.EffectiveLogicalPortMembers.list(
+            yellow_group.id))
     print("")
 
     # Now modify the logical port's color to yellow.
-    lport = logicalports_svc.get(lport.id)
+    lport = api_client.LogicalPorts.get(lport.id)
     lport.tags = [Tag(scope="color", tag="yellow")]
-    logicalports_svc.update(lport.id, lport)
+    api_client.LogicalPorts.update(lport.id, lport)
 
     # Wait for group recalculation
     time.sleep(2.0)
@@ -247,37 +240,41 @@ def main():
     # Notice that the logical port is now in the yellow group
     # and no longer in the green group.
     print("After changing lport color to yellow:")
-    print_group_effective_members("green group",
-                                  efflports_svc.list(green_group.id))
-    print_group_effective_members("yellow group",
-                                  efflports_svc.list(yellow_group.id))
+    print_group_effective_members(
+        "green group", api_client.ns_groups.EffectiveLogicalPortMembers.list(
+            green_group.id))
+    print_group_effective_members(
+        "yellow group", api_client.ns_groups.EffectiveLogicalPortMembers.list(
+            yellow_group.id))
     print("")
 
     # Now clear the tag
-    lport = logicalports_svc.get(lport.id)
+    lport = api_client.LogicalPorts.get(lport.id)
     lport.tags = []
-    logicalports_svc.update(lport.id, lport)
+    api_client.LogicalPorts.update(lport.id, lport)
 
     # Wait for group recalculation
     time.sleep(2.0)
 
     # The port should be in neither group
     print("After removing lport color tag:")
-    print_group_effective_members("green group",
-                                  efflports_svc.list(green_group.id))
-    print_group_effective_members("yellow group",
-                                  efflports_svc.list(yellow_group.id))
+    print_group_effective_members(
+        "green group", api_client.ns_groups.EffectiveLogicalPortMembers.list(
+            green_group.id))
+    print_group_effective_members(
+        "yellow group", api_client.ns_groups.EffectiveLogicalPortMembers.list(
+            yellow_group.id))
     print("")
 
     print("Press enter to delete all resources created for this example.")
     sys.stdin.readline()
 
     # Delete all resources we created.
-    logicalports_svc.delete(lport.id)
-    nsgroups_svc.delete(green_group.id)
-    nsgroups_svc.delete(yellow_group.id)
-    logicalswitches_svc.delete(ls.id)
-    transportzones_svc.delete(tz.id)
+    api_client.LogicalPorts.delete(lport.id)
+    api_client.NsGroups.delete(green_group.id)
+    api_client.NsGroups.delete(yellow_group.id)
+    api_client.LogicalSwitches.delete(ls.id)
+    api_client.TransportZones.delete(tz.id)
 
 
 if __name__ == "__main__":
