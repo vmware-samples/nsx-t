@@ -3,7 +3,7 @@
 """
 NSX-T SDK Sample Code
 
-Copyright 2017 VMware, Inc.  All rights reserved
+Copyright 2017-2019 VMware, Inc.  All rights reserved
 
 The BSD-2 license (the "License") set forth below applies to all
 parts of the NSX-T SDK Sample Code project.  You may not use this
@@ -78,7 +78,7 @@ def main():
                             required=True,
                             help="remote enforcement point (nsx-t manager "
                             "ip address or hostname)")
-    arg_parser.add_argument("-r", "--remote_login_user", type=str,
+    arg_parser.add_argument("-l", "--remote_login_user", type=str,
                             required=True, help="remote login username")
     arg_parser.add_argument("-c", "--remote_login_password", type=str,
                             required=True, help="remote login password")
@@ -86,21 +86,17 @@ def main():
                             required=True,
                             help="remote ssl SHA256 thumbprint")
     args = arg_parser.parse_args()
-    stub_config = auth.get_basic_auth_stub_config(args.user, args.password,
-                                                  args.nsx_host,
-                                                  args.tcp_port)
+
+    api_client = auth.create_nsx_policy_api_client(
+        args.user, args.password, args.nsx_host, args.tcp_port,
+        auth_type=auth.SESSION_AUTH)
 
     # Create a pretty printer to make the output look nice.
     pp = PrettyPrinter()
 
-    # Create the services we'll need.
-    infra_svc = Infra(stub_config)
-    dz_svc = DeploymentZones(stub_config)
-    ep_svc = EnforcementPoints(stub_config)
-
     DEFAULT_DZ_ID = "default"
     # Read the default deployment zone
-    default_dz = dz_svc.get(DEFAULT_DZ_ID)
+    default_dz = api_client.infra.DeploymentZones.get(DEFAULT_DZ_ID)
 
     # Print the current enforcement points
     print("Initial enforcement points: ")
@@ -119,12 +115,12 @@ def main():
     )
 
     try:
-        ep_svc.patch(DEFAULT_DZ_ID, "example", ep)
+        api_client.infra.EnforcementPoints.patch(DEFAULT_DZ_ID, "example", ep)
     except Error as ex:
         api_error = ex.data.convert_to(ApiError)
         print("An error occurred: %s" % api_error.error_message)
 
-    eps = ep_svc.list(DEFAULT_DZ_ID)
+    eps = api_client.infra.EnforcementPoints.list(DEFAULT_DZ_ID)
     pp.pprint(eps)
 
     print("You can now examine the enforcement points in the")
@@ -132,7 +128,7 @@ def main():
     sys.stdin.readline()
 
     # Delete the enforcement point
-    ep_svc.delete(DEFAULT_DZ_ID, "example")
+    api_client.infra.EnforcementPoints.delete(DEFAULT_DZ_ID, "example")
     print("After deleting enforcement point")
 
 if __name__ == "__main__":
