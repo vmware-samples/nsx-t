@@ -44,6 +44,10 @@ import org.apache.commons.cli.ParseException;
 
 import com.vmware.nsx.examples.authentication.VmcNsxAuthenticationHelper;
 import com.vmware.nsx_policy.Infra;
+import com.vmware.nsx_policy.infra.Domains;
+import com.vmware.nsx_policy.infra.domains.CommunicationMaps;
+import com.vmware.nsx_policy.model.CommunicationMapListResult;
+import com.vmware.nsx_policy.model.DomainListResult;
 import com.vmware.nsx_vmc_app.infra.LinkedVpcs;
 import com.vmware.nsx_vmc_app.model.LinkedVpcsListResult;
 import com.vmware.vapi.client.ApiClient;
@@ -100,9 +104,18 @@ public class Vmc {
         com.vmware.nsx_policy.model.Infra infra = infraService.get(null);
         System.out.println(infra);
 
+        Domains domains = apiClient.createStub(Domains.class);
+        DomainListResult domainsList = domains.list(null,  null,  1000L,  false,  null);
+        System.out.println(domainsList);
+
         // ...as well as the NSX-T VMC app APIs.
         LinkedVpcs lvpcSvc = apiClient.createStub(LinkedVpcs.class);
         LinkedVpcsListResult results = lvpcSvc.list();
         System.out.println(results);
+
+        CommunicationMaps communicationMaps = apiClient.createStub(CommunicationMaps.class);
+        CommunicationMapListResult mapListResult = communicationMaps.list("mgw", null, null, 1000L, false, null);
+        System.out.println(mapListResult);
+
     }
 }
