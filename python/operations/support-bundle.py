@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 """
-* *******************************************************
-* Copyright (c) VMware, Inc. 2017. All Rights Reserved.
+* **********************************************************
+* Copyright (c) VMware, Inc. 2017-2019. All Rights Reserved.
 * SPDX-License-Identifier: BSD-2
-* *******************************************************
+* **********************************************************
 *
 * DISCLAIMER. THIS PROGRAM IS PROVIDED TO YOU "AS IS" WITHOUT
 * WARRANTIES OR CONDITIONS OF ANY KIND, WHETHER ORAL OR WRITTEN,
@@ -14,13 +14,13 @@
 
 from util import auth
 from util import getargs
-from com.vmware.nsx.administration_client import SupportBundles
+from com.vmware.nsx.model_client import ApiError
 from com.vmware.nsx.model_client import SupportBundleRequest
 from com.vmware.nsx.model_client import SupportBundleRemoteFileServer
 from com.vmware.nsx.model_client import SupportBundleFileTransferProtocol
 from com.vmware.nsx.model_client import (
     SupportBundleFileTransferAuthenticationScheme)
-from com.vmware.nsx.cluster_client import Nodes
+from com.vmware.vapi.std.errors_client import Error
 from vmware.vapi.bindings.struct import PrettyPrinter
 
 """
@@ -40,7 +40,7 @@ def main():
     arg_parser = getargs.get_arg_parser()
     arg_parser.add_argument("-s", "--remote_ssh_server", type=str,
                             required=True, help="remote ssh server")
-    arg_parser.add_argument("-r", "--remote_ssh_user", type=str,
+    arg_parser.add_argument("-w", "--remote_ssh_user", type=str,
                             required=True, help="remote ssh username")
     arg_parser.add_argument("-c", "--remote_ssh_password", type=str,
                             required=True, help="remote ssh password")
@@ -48,19 +48,14 @@ def main():
                             required=True,
                             help="remote ssh SHA256 fingerprint")
     args = arg_parser.parse_args()
-    stub_config = auth.get_session_auth_stub_config(args.user, args.password,
-                                                    args.nsx_host,
-                                                    args.tcp_port)
-
+    api_client = auth.create_nsx_api_client(args.user, args.password,
+                                            args.nsx_host, args.tcp_port,
+                                            auth_type=auth.SESSION_AUTH)
     pp = PrettyPrinter()
-
-    # Instantiate all the services we'll need.
-    sb_svc = SupportBundles(stub_config)
-    cl_node_svc = Nodes(stub_config)
 
     # Get the UUID of the manager node we're talking to. We'll
     # request a support bundle from it.
-    mgr_node = cl_node_svc.get("self")
+    mgr_node = api_client.cluster.Nodes.get("self")
     mgr_uuid = mgr_node.id
     print(mgr_uuid)
 
@@ -84,8 +79,12 @@ def main():
         nodes=[mgr_uuid],
         remote_file_server=rfs
     )
-    resp = sb_svc.collect(sb_request)
-    pp.pprint(resp)
+    try:
+        resp = api_client.administration.SupportBundles.collect(sb_request)
+        pp.pprint(resp)
+    except Error as ex:
+        api_error = ex.data.convert_to(ApiError)
+        print("An error occurred: %s" % api_error.error_message)
 
 
 if __name__ == "__main__":
