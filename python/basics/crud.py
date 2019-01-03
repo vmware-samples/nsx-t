@@ -3,7 +3,7 @@
 """
 NSX-T SDK Sample Code
 
-Copyright 2017 VMware, Inc.  All rights reserved
+Copyright 2017-2019 VMware, Inc.  All rights reserved
 
 The BSD-2 license (the "License") set forth below applies to all
 parts of the NSX-T SDK Sample Code project.  You may not use this
@@ -43,7 +43,6 @@ import sys
 from util import auth
 from util import getargs
 from vmware.vapi.bindings.struct import PrettyPrinter
-from com.vmware.nsx_client import TransportZones
 from com.vmware.nsx.model_client import TransportZone
 from com.vmware.vapi.std.errors_client import NotFound
 
@@ -75,19 +74,17 @@ DELETE /api/v1/transport-zones/<zone-id>
 
 def main():
     args = getargs.getargs()
-    stub_config = auth.get_session_auth_stub_config(args.user, args.password,
-                                                    args.nsx_host,
-                                                    args.tcp_port)
 
     # Create a pretty printer to make the output look nice.
     pp = PrettyPrinter()
 
-    # Create the service we'll need.
-    transportzones_svc = TransportZones(stub_config)
+    api_client = auth.create_nsx_api_client(args.user, args.password,
+                                            args.nsx_host, args.tcp_port,
+                                            auth_type=auth.SESSION_AUTH)
 
     # First, list all transport zones. If your NSX installation has
     # just been installed, this should return an empty list.
-    tzs = transportzones_svc.list()
+    tzs = api_client.TransportZones.list()
     print("Initial list of transport zones - %d zones" % tzs.result_count)
     pp.pprint(tzs)
 
@@ -98,20 +95,20 @@ def main():
         description="Transport zone for basic create/read/update/delete demo",
         host_switch_name="hostswitch1"
     )
-    result_tz = transportzones_svc.create(new_tz)
+    result_tz = api_client.TransportZones.create(new_tz)
     print("Transport zone created. id is %s" % result_tz.id)
 
     # Save the id, which uniquely identifies the resource we created.
     tz_id = result_tz.id
 
     # Read that transport zone.
-    read_tz = transportzones_svc.get(tz_id)
+    read_tz = api_client.TransportZones.get(tz_id)
     print("Re-read the transport zone")
     pp.pprint(read_tz)
 
     # List all transport zones again. The newly created transport
     # zone will be in the list.
-    tzs = transportzones_svc.list()
+    tzs = api_client.TransportZones.list()
     print("Updated list of transport zones - %d zones" % tzs.result_count)
     pp.pprint(tzs)
 
@@ -121,7 +118,7 @@ def main():
 
     # Update the transport zone.
     read_tz.description = "Updated description for transport zone"
-    updated_tz = transportzones_svc.update(tz_id, read_tz)
+    updated_tz = api_client.TransportZones.update(tz_id, read_tz)
     print("After updating description. Note that the revision property is "
           "automatically updated.")
     pp.pprint(updated_tz)
@@ -142,19 +139,19 @@ def main():
     # error, the client must re-read the resource, apply any desired
     # updates, and perform another update operation.
     updated_tz.description = "Updated description again for transport zone"
-    updated_tz = transportzones_svc.update(tz_id, updated_tz)
+    updated_tz = api_client.TransportZones.update(tz_id, updated_tz)
     print("After updating description again.")
     pp.pprint(updated_tz)
 
     # Delete the transport zone.
-    transportzones_svc.delete(tz_id)
+    api_client.TransportZones.delete(tz_id)
     print("After deleting transport zone")
 
     # Now if we try to read the transport zone, we should get a
     # 404 Not Found error. This example also shows how you can
     # check for and handle specific errors from the NSX API.
     try:
-        read_tz = transportzones_svc.get(tz_id)
+        read_tz = api_client.TransportZones.get(tz_id)
     except NotFound:
         print("Transport zone is gone, as expected")
 
