@@ -3,7 +3,7 @@
 """
 NSX-T SDK Sample Code
 
-Copyright 2017 VMware, Inc.  All rights reserved
+Copyright 2017-2019 VMware, Inc.  All rights reserved
 
 The BSD-2 license (the "License") set forth below applies to all
 parts of the NSX-T SDK Sample Code project.  You may not use this
@@ -43,7 +43,6 @@ import sys
 from util import auth
 from util import getargs
 from vmware.vapi.bindings.struct import PrettyPrinter
-from com.vmware.nsx_client import TransportZones
 from com.vmware.nsx.model_client import ApiError
 from com.vmware.nsx.model_client import TransportZone
 from com.vmware.vapi.std.errors_client import Error
@@ -63,15 +62,13 @@ POST /api/v1/transport-zones
 
 def main():
     args = getargs.getargs()
-    stub_config = auth.get_session_auth_stub_config(args.user, args.password,
-                                                    args.nsx_host,
-                                                    args.tcp_port)
+
+    api_client = auth.create_nsx_api_client(args.user, args.password,
+                                            args.nsx_host, args.tcp_port,
+                                            auth_type=auth.SESSION_AUTH)
 
     # Create a pretty printer to make the output look nice.
     pp = PrettyPrinter()
-
-    # Create the service we'll need.
-    transportzones_svc = TransportZones(stub_config)
 
     # Create a transport zone, but intentionally pass an incorrect
     # overlay type, so we cause an error.
@@ -82,7 +79,7 @@ def main():
         host_switch_name="hostswitch1"
     )
     try:
-        result_tz = transportzones_svc.create(new_tz)
+        result_tz = api_client.TransportZones.create(new_tz)
     except Error as ex:
         api_error = ex.data.convert_to(ApiError)
         print("An error occurred: %s" % api_error.error_message)
