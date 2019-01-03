@@ -3,7 +3,7 @@
 """
 NSX-T SDK Sample Code
 
-Copyright 2017 VMware, Inc.  All rights reserved
+Copyright 2017-2019 VMware, Inc.  All rights reserved
 
 The BSD-2 license (the "License") set forth below applies to all
 parts of the NSX-T SDK Sample Code project.  You may not use this
@@ -42,7 +42,6 @@ POSSIBILITY OF SUCH DAMAGE.
 from util import auth
 from util import getargs
 from com.vmware.nsx.fabric.nodes_client import Status
-from com.vmware.nsx.fabric_client import Nodes
 from com.vmware.nsx.model_client import Node
 from com.vmware.vapi.std.errors_client import NotFound
 
@@ -64,16 +63,12 @@ GET /api/v1/fabric/nodes/<node-id>/status
 
 def main():
     args = getargs.getargs()
-    stub_config = auth.get_session_auth_stub_config(args.user, args.password,
-                                                    args.nsx_host,
-                                                    args.tcp_port)
 
-    # Create the services we'll need.
-    fabricnodes_svc = Nodes(stub_config)
-    status_svc = Status(stub_config)
-
+    api_client = auth.create_nsx_api_client(args.user, args.password,
+                                            args.nsx_host, args.tcp_port,
+                                            auth_type=auth.SESSION_AUTH)
     # List all of the fabric nodes
-    result = fabricnodes_svc.list()
+    result = api_client.fabric.Nodes.list()
 
     # Iterate over the results
     for vs in result.results:
