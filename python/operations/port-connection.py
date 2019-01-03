@@ -3,7 +3,7 @@
 """
 NSX-T SDK Sample Code
 
-Copyright 2017 VMware, Inc.  All rights reserved
+Copyright 2017-2019 VMware, Inc.  All rights reserved
 
 The BSD-2 license (the "License") set forth below applies to all
 parts of the NSX-T SDK Sample Code project.  You may not use this
@@ -41,8 +41,6 @@ POSSIBILITY OF SUCH DAMAGE.
 
 import sys
 
-from com.vmware.nsx_client import LogicalPorts
-from com.vmware.nsx.logical_ports_client import ForwardingPath
 from com.vmware.vapi.std.errors_client import NotFound
 from util import auth
 from util import getargs
@@ -77,19 +75,14 @@ def main():
     if len(ports) not in (0, 2):
         arg_parser.error("Give exactly two logical port IDs, or none to "
                          "get a list of logical ports.")
-
-    stub_config = auth.get_session_auth_stub_config(args.user, args.password,
-                                                    args.nsx_host,
-                                                    args.tcp_port)
+    api_client = auth.create_nsx_api_client(args.user, args.password,
+                                            args.nsx_host, args.tcp_port,
+                                            auth_type=auth.SESSION_AUTH)
 
     pp = PrettyPrinter()
 
-    # Instantiate all the services we'll need.
-    lp_svc = LogicalPorts(stub_config)
-    forwardingpath_svc = ForwardingPath(stub_config)
-
     # Find all logical ports
-    all_lps = lp_svc.list().results
+    all_lps = api_client.LogicalPorts.list().results
     lp_ids = [lp.id for lp in all_lps]
     fail = False
     for port in ports:
@@ -114,7 +107,7 @@ def main():
 
     else:
         # Print forwarding path
-        path = forwardingpath_svc.get(ports[0], ports[1])
+        path = api_client.logical_ports.ForwardingPath.get(ports[0], ports[1])
         pp.pprint(path)
 
 if __name__ == "__main__":
