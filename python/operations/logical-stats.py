@@ -3,7 +3,7 @@
 """
 NSX-T SDK Sample Code
 
-Copyright 2017 VMware, Inc.  All rights reserved
+Copyright 2017-2019 VMware, Inc.  All rights reserved
 
 The BSD-2 license (the "License") set forth below applies to all
 parts of the NSX-T SDK Sample Code project.  You may not use this
@@ -39,13 +39,6 @@ ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 """
 
-from com.vmware.nsx_client import LogicalPorts
-from com.vmware.nsx_client import LogicalRouterPorts
-from com.vmware.nsx_client import LogicalRouters
-from com.vmware.nsx_client import LogicalSwitches
-from com.vmware.nsx import logical_ports_client
-from com.vmware.nsx.logical_router_ports import statistics_client
-from com.vmware.nsx import logical_switches_client
 from com.vmware.nsx.model_client import LogicalRouterPort
 from com.vmware.vapi.std.errors_client import NotFound
 from util import auth
@@ -131,33 +124,24 @@ def print_lrp_stats(stats):
 
 def main():
     args = getargs.getargs()
-    stub_config = auth.get_session_auth_stub_config(args.user, args.password,
-                                                    args.nsx_host,
-                                                    args.tcp_port)
-
+    api_client = auth.create_nsx_api_client(args.user, args.password,
+                                            args.nsx_host, args.tcp_port,
+                                            auth_type=auth.SESSION_AUTH)
     pp = PrettyPrinter()
 
-    # Instantiate all the services we'll need.
-    ls_svc = LogicalSwitches(stub_config)
-    ls_statistics_svc = logical_switches_client.Statistics(stub_config)
-    lp_svc = LogicalPorts(stub_config)
-    lp_statistics_svc = logical_ports_client.Statistics(stub_config)
-    lrp_svc = LogicalRouterPorts(stub_config)
-    lrp_statistics_svc = statistics_client.Summary(stub_config)
-
     # Find all logical switches and show statistics for each.
-    all_ls = ls_svc.list()
+    all_ls = api_client.LogicalSwitches.list()
     print("***** Showing statistics for %d logical switches" %
           all_ls.result_count)
     for ls in all_ls.results:
         print("Logical switch %s (id %s)" % (ls.display_name, ls.id))
         # Retrieve the statistics for the switch
-        stats = ls_statistics_svc.get(ls.id)
+        stats = api_client.logical_switches.Statistics.get(ls.id)
         print_l2_stats(stats)
         print("")
 
     # Find all logical ports and show statistics for each.
-    all_lps = lp_svc.list()
+    all_lps = api_client.LogicalPorts.list()
     print("***** Showing statistics for %d logical ports" %
           all_lps.result_count)
     for lp in all_lps.results:
@@ -172,14 +156,15 @@ def main():
 
         # Retrieve the statistics for the port.
         if lp.attachment and lp.attachment.attachment_type == "VIF":
-            stats = lp_statistics_svc.get(lp.id, source="realtime")
+            stats = api_client.logical_ports.Statistics.get(
+                lp.id, source="cached")
         else:
-            stats = lp_statistics_svc.get(lp.id)
+            stats = api_client.logical_ports.Statistice.get(lp.id)
         print_l2_stats(stats)
         print("")
 
     # Find all logical router ports and show statistics for each.
-    all_lrps = lrp_svc.list()
+    all_lrps = api_client.LogicalRouterPorts.list()
     print("***** Showing statistics for %d logical router ports" %
           all_lrps.result_count)
     for lrp in all_lrps.results:
@@ -189,7 +174,8 @@ def main():
         # base class so we can retrieve the type information.
         lrp = lrp.convert_to(LogicalRouterPort)
         print("%s %s (id %s)" % (lrp.resource_type, lrp.display_name, lrp.id))
-        stats = lrp_statistics_svc.get(lrp.id, source="cached")
+        stats = api_client.logical_router_ports.Statistics.get(
+            lrp.id, source="cached")
         print_lrp_stats(stats)
 
 
