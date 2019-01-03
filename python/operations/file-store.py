@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 """
-* *******************************************************
-* Copyright (c) VMware, Inc. 2018. All Rights Reserved.
+* **********************************************************
+* Copyright (c) VMware, Inc. 2018-2019. All Rights Reserved.
 * SPDX-License-Identifier: BSD-2
-* *******************************************************
+* **********************************************************
 *
 * DISCLAIMER. THIS PROGRAM IS PROVIDED TO YOU "AS IS" WITHOUT
 * WARRANTIES OR CONDITIONS OF ANY KIND, WHETHER ORAL OR WRITTEN,
@@ -22,7 +22,6 @@ from com.vmware.nsx.model_client import CopyFromRemoteFileProperties
 from com.vmware.nsx.model_client import CopyToRemoteFileProperties
 from com.vmware.nsx.model_client import PasswordAuthenticationScheme
 from com.vmware.nsx.model_client import ScpProtocol
-from com.vmware.nsx.node_client import FileStore
 from com.vmware.vapi.std.errors_client import Error
 from vmware.vapi.bindings.struct import PrettyPrinter
 
@@ -41,7 +40,7 @@ def main():
     arg_parser = getargs.get_arg_parser()
     arg_parser.add_argument("-s", "--remote_ssh_server", type=str,
                             required=True, help="remote ssh server")
-    arg_parser.add_argument("-r", "--remote_ssh_user", type=str,
+    arg_parser.add_argument("-w", "--remote_ssh_user", type=str,
                             required=True, help="remote ssh username")
     arg_parser.add_argument("-c", "--remote_ssh_password", type=str,
                             required=True, help="remote ssh password")
@@ -52,14 +51,10 @@ def main():
                             required=True,
                             help="full path name of remote file to copy")
     args = arg_parser.parse_args()
-    stub_config = auth.get_session_auth_stub_config(args.user, args.password,
-                                                    args.nsx_host,
-                                                    args.tcp_port)
-
+    api_client = auth.create_nsx_api_client(args.user, args.password,
+                                            args.nsx_host, args.tcp_port,
+                                            auth_type=auth.SESSION_AUTH)
     pp = PrettyPrinter()
-
-    # Instantiate all the services we'll need.
-    fs_svc = FileStore(stub_config)
 
     local_file_name = os.path.basename(args.remote_file_path)
 
@@ -80,7 +75,8 @@ def main():
         protocol=protocol
     )
     try:
-        fs_svc.copyfromremotefile(local_file_name, remote_properties)
+        api_client.node.FileStore.copyfromremotefile(
+            local_file_name, remote_properties)
         print("Copied %s from %s to nsx node %s" %
               (local_file_name, args.remote_ssh_server, args.nsx_host))
     except Error as ex:
@@ -95,13 +91,13 @@ def main():
         protocol=protocol
     )
     try:
-        fs_svc.copytoremotefile(local_file_name, remote_properties)
+        api_client.node.FileStore.copytoremotefile(
+            local_file_name, remote_properties)
         print("Copied %s from nsx_node %s to %s" %
               (local_file_name, args.nsx_host, args.remote_ssh_server))
     except Error as ex:
         api_error = ex.data.convert_to(ApiError)
         print("An error occurred: %s" % api_error.error_message)
-
 
 
 if __name__ == "__main__":
