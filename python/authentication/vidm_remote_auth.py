@@ -3,7 +3,7 @@
 """
 NSX-T SDK Sample Code
 
-Copyright 2017 VMware, Inc.  All rights reserved
+Copyright 2017-2019 VMware, Inc.  All rights reserved
 
 The BSD-2 license (the "License") set forth below applies to all
 parts of the NSX-T SDK Sample Code project.  You may not use this
@@ -42,7 +42,6 @@ import base64
 import pprint
 import requests
 
-from com.vmware.nsx_client import TransportZones
 from util import getargs
 from vmware.vapi.bindings.struct import PrettyPrinter
 from vmware.vapi.lib import connect
@@ -77,12 +76,13 @@ def main():
     # support authentication with this header payload.
     auth_str = base64.b64encode("%s:%s" % (args.user, args.password))
     session.headers["Authorization"] = "Remote %s" % auth_str
+    stub_factory = nsx_client.StubFactory(stub_config)
+    api_client = ApiClient(stub_factory)
 
     # Now any API calls we make should authenticate to NSX by
     # providing an Authorization header with the correct value.
     # Let's get a list of all Transport Zones.
-    transportzones_svc = TransportZones(stub_config)
-    tzs = transportzones_svc.list()
+    tzs = api_client.TransportZones.list()
     # Create a pretty printer to make the output look nice.
     pp = PrettyPrinter()
     pp.pprint(tzs)

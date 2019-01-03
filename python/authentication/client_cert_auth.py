@@ -3,7 +3,7 @@
 """
 NSX-T SDK Sample Code
 
-Copyright 2018 VMware, Inc.  All rights reserved
+Copyright 2018-2019 VMware, Inc.  All rights reserved
 
 The BSD-2 license (the "License") set forth below applies to all
 parts of the NSX-T SDK Sample Code project.  You may not use this
@@ -43,8 +43,9 @@ import argparse
 import pprint
 import requests
 
-from com.vmware.nsx_client import TransportZones
+from com.vmware import nsx_client
 from vmware.vapi.bindings.struct import PrettyPrinter
+from vmware.vapi.bindings.stub import ApiClient
 from vmware.vapi.lib import connect
 from vmware.vapi.stdlib.client.factories import StubConfigurationFactory
 
@@ -75,16 +76,17 @@ def main():
     # Configure the requests library to supply a client certificate
     session.cert = args.client_certificate
 
-    # Set up the API connector
+    # Set up the API connector and client
     nsx_url = 'https://%s:%s' % (args.nsx_host, args.tcp_port)
     connector = connect.get_requests_connector(
         session=session, msg_protocol='rest', url=nsx_url)
     stub_config = StubConfigurationFactory.new_std_configuration(connector)
+    stub_factory = nsx_client.StubFactory(stub_config)
+    api_client = ApiClient(stub_factory)
 
     # Now any API calls we make should authenticate to NSX using
     # the client certificate. Let's get a list of all Transport Zones.
-    transportzones_svc = TransportZones(stub_config)
-    tzs = transportzones_svc.list()
+    tzs = api_client.TransportZones.list()
     # Create a pretty printer to make the output look nice.
     pp = PrettyPrinter()
     pp.pprint(tzs)
