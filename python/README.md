@@ -71,13 +71,15 @@ To install the SDK and its dependencies, issue the following commands:
     source venv/bin/activate
 
     # 3) Copy the NSX-T SDKs and vapi runtime:
-    # For NSX-T 2.2, navigate to the VMware{code} website python SDK
+    # For NSX-T 2.3, navigate to the VMware{code} website python SDK
     # site at https://code.vmware.com/sdks and follow the
     # VMware NSX-T for Python link.
     # Copy all SDK files to the lib directory in this repo.
     # The complete list of files needed are:
-    # nsx_python_sdk-2.2.0.0.0.8680797-doc.zip
-    # nsx_python_sdk-2.2.0.0.0.8680797-py2.py3-none-any.whl
+    # nsx_python_sdk-2.3.0.0.0.10085514-doc.zip
+    # nsx_python_sdk-2.3.0.0.0.10085514-py2.py3-none-any.whl
+    # nsx_policy_python_sdk-2.3.0.0.0.10085514-doc.zip
+    # nsx_policy_python_sdk-2.3.0.0.0.10085514-py2.py3-none-any.whl
     # vapi_common-2.9.0-py2.py3-none-any.whl
     # vapi_common_client-2.9.0-py2.py3-none-any.whl
     # vapi_runtime-2.9.0-py2.py3-none-any.whl
