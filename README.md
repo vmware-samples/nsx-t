@@ -22,7 +22,7 @@ Follow the steps in the java/README.md or python/README.md files.
 
 ## Releases & Major Branches
 
-The API samples have been tested with NSX-T version 2.1. As new
+The API samples have been tested with NSX-T version 2.3. As new
 releases of NSX-T become available, additional samples will be
 developed and a new git tag will be created indicating the NSX-T
 release associated with the samples. You can use
