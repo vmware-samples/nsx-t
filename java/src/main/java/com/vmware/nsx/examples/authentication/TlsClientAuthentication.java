@@ -87,13 +87,13 @@ import com.vmware.vapi.protocol.HttpConfiguration.SslConfiguration;
  *      -dname "CN=My Client, OU=My Org, O=Acme, L=Palo Alto, ST=CA, C=US"
  *    will create a Java keystore named keystore.jks, protected with the
  *    password "password", and will place a self-signed certificate
- *    and private key in that keystore.
+ *    with alias "client" and an associated private key in that keystore.
  *
  * 2) Extract a PEM-formatted certificate:
  *    keytool -export -alias client -keystore self-signed.jks -rfc \
  *      -file client.pem
  *    will extract the public certificate in PEM format in the file
- *    named "client.pem.
+ *    named "client.pem".
  *    Upload this certificate to NSX-T with the
  *    POST /api/v1/trust-management/certificates API:
  *    curl -u admin:<admin_password> -H "Content-Type: application/json" \
@@ -127,6 +127,14 @@ import com.vmware.vapi.protocol.HttpConfiguration.SslConfiguration;
  *  entries will show the username as "my_client". The Java code below
  *  shows you how to create an API client that presents the certificate
  *  when the TLS connection is established.
+ *
+ *  If you followed the example above, the correct command-line
+ *  arguments to run the example will be:
+ *
+ *  -n <your-nxt-manager-ip-or-hostname>
+ *  -k  "/full/path/to/self-signed.jks"
+ *  -a "client"
+ *  -p password
  */
 
 public class TlsClientAuthentication {
