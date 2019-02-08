@@ -132,7 +132,7 @@ import com.vmware.vapi.protocol.HttpConfiguration.SslConfiguration;
  *  arguments to run the example will be:
  *
  *  -n <your-nxt-manager-ip-or-hostname>
- *  -k  "/full/path/to/self-signed.jks"
+ *  -k  "/full/path/to/keystore.jks"
  *  -a "client"
  *  -p password
  */
