@@ -90,7 +90,7 @@ import com.vmware.vapi.protocol.HttpConfiguration.SslConfiguration;
  *    with alias "client" and an associated private key in that keystore.
  *
  * 2) Extract a PEM-formatted certificate:
- *    keytool -export -alias client -keystore self-signed.jks -rfc \
+ *    keytool -export -alias client -keystore keystore.jks -rfc \
  *      -file client.pem
  *    will extract the public certificate in PEM format in the file
  *    named "client.pem".
