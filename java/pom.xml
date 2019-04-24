@@ -12,8 +12,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <VAPI_VERSION>2.9.0</VAPI_VERSION>
-    <NSX_JAVA_SDK_VERSION>2.3.0.0.2.18113548</NSX_JAVA_SDK_VERSION>
+    <VAPI_VERSION>2.11.0</VAPI_VERSION>
+    <NSX_JAVA_SDK_VERSION>2.5.0.0.0.23003246</NSX_JAVA_SDK_VERSION>
   </properties>
 
   <dependencies>

@@ -164,7 +164,7 @@ public class Tagging {
         // First, create a new group whose members are any logical
         // ports with a tag scope of "color" and tag value of "green"
         NSGroupTagExpression expression = new NSGroupTagExpression.Builder(
-                "LogicalPort", "NSGroupTagExpression").setScopeOp("EQUALS")
+                "LogicalPort").setScopeOp("EQUALS")
                         .setScope("color").setTagOp("EQUALS").setTag("green")
                         .build();
         NSGroup group = new NSGroup.Builder()
@@ -176,7 +176,7 @@ public class Tagging {
 
         // Now create another group for color:yellow logical ports.
         expression = new NSGroupTagExpression.Builder(
-                "LogicalPort", "NSGroupTagExpression").setScopeOp("EQUALS")
+                "LogicalPort").setScopeOp("EQUALS")
                         .setScope("color").setTagOp("EQUALS").setTag("green")
                         .build();
         group = new NSGroup.Builder()

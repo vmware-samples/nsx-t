@@ -105,7 +105,7 @@ public class Vmc {
         System.out.println(infra);
 
         Domains domains = apiClient.createStub(Domains.class);
-        DomainListResult domainsList = domains.list(null,  null,  1000L,  false,  null);
+        DomainListResult domainsList = domains.list(null,  false, null, 1000L,  false,  null);
         System.out.println(domainsList);
 
         // ...as well as the NSX-T VMC app APIs.
@@ -114,7 +114,7 @@ public class Vmc {
         System.out.println(results);
 
         CommunicationMaps communicationMaps = apiClient.createStub(CommunicationMaps.class);
-        CommunicationMapListResult mapListResult = communicationMaps.list("mgw", null, null, 1000L, false, null);
+        CommunicationMapListResult mapListResult = communicationMaps.list("mgw", null, false, null, 1000L, false, null);
         System.out.println(mapListResult);
 
     }

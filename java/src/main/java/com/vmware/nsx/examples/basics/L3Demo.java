@@ -221,7 +221,7 @@ public class L3Demo {
         ResourceReference linkedLSPort = new ResourceReference.Builder()
                 .setTargetId(dbPortOnLS.getId()).build();
         LogicalRouterDownLinkPort newLRPort = new LogicalRouterDownLinkPort.Builder(
-                subnets, "LogicalRouterDownLinkPort", lr.getId())
+                subnets, lr.getId())
                         .setLinkedLogicalSwitchPortId(linkedLSPort).build();
         // Create the downlink port
         LogicalRouterDownLinkPort lrPortForDbTier = lrportService
@@ -235,7 +235,7 @@ public class L3Demo {
                 new IPSubnet.Builder(Arrays.asList("192.168.2.1"), 24).build());
         linkedLSPort = new ResourceReference.Builder()
                 .setTargetId(webPortOnLS.getId()).build();
-        newLRPort = new LogicalRouterDownLinkPort.Builder(subnets, "LogicalRouterDownLinkPort", lr.getId())
+        newLRPort = new LogicalRouterDownLinkPort.Builder(subnets, lr.getId())
                 .setLinkedLogicalSwitchPortId(linkedLSPort).build();
         // Create the downlink port
         LogicalRouterDownLinkPort lrPortForWebTier = lrportService
@@ -324,11 +324,11 @@ public class L3Demo {
         scanner.close();
 
         fwSectionService.delete(section.getId(), true);
-        lrportService.delete(lrPortForWebTier.getId(), true);
-        lrportService.delete(lrPortForDbTier.getId(), true);
-        lrportService.delete(webPortOnLS.getId(), true);
-        lrportService.delete(dbPortOnLS.getId(), true);
-        routerService.delete(lr.getId(), true);
+        lrportService.delete(lrPortForWebTier.getId(), true, true);
+        lrportService.delete(lrPortForDbTier.getId(), true, true);
+        lrportService.delete(webPortOnLS.getId(), true, true);
+        lrportService.delete(dbPortOnLS.getId(), true, true);
+        routerService.delete(lr.getId(), true, true);
         switchService.delete(webLS.getId(), true, true);
         switchService.delete(dbLS.getId(), true, true);
         zoneService.delete(demoTZ.getId());

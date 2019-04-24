@@ -87,7 +87,7 @@ public class Crud {
 
         // First, list all transport zones. If your NSX installation has
         // just been installed, this should return an empty list.
-        TransportZoneListResult zones = zoneService.list(null, null, null, null, null, null);
+        TransportZoneListResult zones = zoneService.list(null, null, null, null, null, null, null, null);
         System.out.println("Initial list of transport zones - " + zones.getResultCount() + " zones");
         System.out.println(zones);
 
@@ -112,7 +112,7 @@ public class Crud {
 
         // List all transport zones again. The newly created transport
         // zone will be in the list.
-        zones = zoneService.list(null, null, null, null, null, null);
+        zones = zoneService.list(null, null, null, null, null, null, null, null);
         System.out.println("Updated list of transport zones - " + zones.getResultCount() + " zones");
         System.out.println(zones);
 
