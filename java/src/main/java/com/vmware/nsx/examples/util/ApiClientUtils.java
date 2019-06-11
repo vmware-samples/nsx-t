@@ -54,6 +54,7 @@ import com.vmware.vapi.protocol.HttpConfiguration.SslConfiguration;
 
 public class ApiClientUtils {
     public static ApiClient apiClient = null;
+    public static final int RESPONSE_TIMEOUT_SECONDS = 60;  // Maximum time to wait for a response
 
     public static ApiClient createApiClient(String mgrUrl, String username,
             char[] password) {
@@ -73,6 +74,7 @@ public class ApiClientUtils {
         SslConfiguration sslConfig = sslConfigBuilder.getConfig();
 
         HttpConfiguration httpConfig = new HttpConfiguration.Builder()
+                .setSoTimeout(RESPONSE_TIMEOUT_SECONDS * 1000)
                 .setSslConfiguration(sslConfig).getConfig();
 
         StubConfiguration stubConfig = new StubConfiguration();
