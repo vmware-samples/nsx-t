@@ -1,7 +1,7 @@
 /*
  * NSX-T SDK Sample Code
  *
- * Copyright 2017 VMware, Inc.  All rights reserved
+ * Copyright 2019 VMware, Inc.  All rights reserved
  *
  * The BSD-2 license (the "License") set forth below applies to all
  * parts of the NSX-T SDK Sample Code project.  You may not use this
@@ -57,7 +57,7 @@ import com.vmware.nsx_policy.model.Tier1;
 import com.vmware.vapi.client.ApiClient;
 
 /*-
-
+  Create a tier-1 gateway, add a Segment to it, then add a Port on the segment.
  */
 public class CrudPolicy {
 
