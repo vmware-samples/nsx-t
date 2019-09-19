@@ -68,7 +68,8 @@ def get_basic_auth_stub_config(user, password, nsx_host, tcp_port=443):
     nsx_url = 'https://%s:%s' % (nsx_host, tcp_port)
     connector = connect.get_requests_connector(
         session=session, msg_protocol='rest', url=nsx_url)
-    stub_config = StubConfigurationFactory.new_std_configuration(connector)
+    stub_config = StubConfigurationFactory.new_runtime_configuration(
+        connector, response_extractor=True)
     security_context = create_user_password_security_context(
         user, password)
     connector.set_security_context(security_context)
@@ -106,7 +107,8 @@ def get_session_auth_stub_config(user, password, nsx_host, tcp_port=443):
 
     connector = connect.get_requests_connector(
         session=session, msg_protocol='rest', url=nsx_url)
-    stub_config = StubConfigurationFactory.new_std_configuration(connector)
+    stub_config = StubConfigurationFactory.new_runtime_configuration(
+        connector, response_extractor=True)
     return stub_config
 
 
