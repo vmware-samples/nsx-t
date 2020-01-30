@@ -61,7 +61,7 @@ with "pip install google-api-core".
 
 # Call the given API, retrying if the API fails with a ServiceUnavailble
 # exception (both the 429 Too Meny Requests and 503 Service Unavailable
-# responses that the NSX-T API may return map this this exception).
+# responses that the NSX-T API may return map to this exception).
 # Initially back off for one tenth of a second. By default, the Retry
 # will double the backoff interval each time up to a maximum of
 # 60 seconds. For more information on Retry, see
