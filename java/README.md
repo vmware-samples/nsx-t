@@ -53,14 +53,15 @@ Then obtain the VMware NSX-T for Java SDK and the vapi runtime from
 the VMware{code} website at https://code.vmware.com/sdks. Copy all the
 jar files to the lib directory inside the java directory.
 
-This is the list of files needed for NSX-T 2.2:
+This is the list of files needed for NSX-T 2.5.1:
 
-nsx-java-sdk-2.2.0.0.0.8680797-javadoc.jar
-nsx-java-sdk-2.2.0.0.0.8680797.jar
-vapi-authentication-2.9.0-javadoc.jar
-vapi-authentication-2.9.0.jar
-vapi-runtime-2.9.0-javadoc.jar
-vapi-runtime-2.9.0.jar
+nsx-java-sdk-2.5.1.0.0.15314313.jar
+nsx-policy-java-sdk-2.5.1.0.0.15314313.jar
+nsx-vmc-aws-integration-java-sdk-2.5.1.0.0.15314313.jar
+nsx-vmc-sdk-common-2.5.1.0.0.15314313.jar
+vapi-authentication-2.12.0.jar
+vapi-runtime-2.12.0.jar
+vapi-vmc-sdk-2.12.0.jar
 
 You can then compile all of the samples with two maven commands:
 
