@@ -1,0 +1,87 @@
+formatVersion: 1
+inputs: {}
+resources:
+  SG_all_vm:
+    type: Cloud.SecurityGroup
+    properties:
+      securityGroupType: new
+      name: vra-all-vm
+      rules:
+        - access: Deny
+          source: ANY
+          direction: inbound
+          name: deny-SSH
+          ports: '22'
+          protocol: TCP
+  SG_web:
+    type: Cloud.SecurityGroup
+    properties:
+      securityGroupType: new
+      name: vra-web-vm
+      rules:
+        - access: Allow
+          source: ANY
+          direction: inbound
+          name: allow-HTTP-HTTPS
+          ports: '80,443'
+          protocol: TCP
+  SG_app:
+    type: Cloud.SecurityGroup
+    properties:
+      securityGroupType: new
+      name: vra-app-vm
+  SG_db:
+    type: Cloud.SecurityGroup
+    properties:
+      securityGroupType: new
+      name: vra-db-vm
+      rules:
+        - access: Allow
+          source: '${SG_app.id}'
+          direction: inbound
+          name: allow-mysql
+          ports: '3306'
+          protocol: TCP
+  VM_web:
+    type: Cloud.Machine
+    properties:
+      image: ubuntu
+      flavor: small
+      customizationSpec: linux
+      networks:
+        - network: '${resource["tier-1_network"].id}'
+          securityGroups:
+            - '${resource.SG_web.id}'
+            - '${resource.SG_all_vm.id}'
+      count: 1
+  App_VM:
+    type: Cloud.Machine
+    properties:
+      image: ubuntu
+      flavor: small
+      customizationSpec: linux
+      networks:
+        - network: '${resource["tier-1_network"].id}'
+          securityGroups:
+            - '${resource.SG_app.id}'
+            - '${resource.SG_all_vm.id}'
+      count: 1
+  DB_VM:
+    type: Cloud.Machine
+    properties:
+      image: ubuntu
+      flavor: small
+      customizationSpec: linux
+      networks:
+        - network: '${resource["tier-1_network"].id}'
+          securityGroups:
+            - '${resource.SG_db.id}'
+            - '${resource.SG_all_vm.id}'
+      count: 1
+  tier-1_network:
+    type: Cloud.NSX.Network
+    properties:
+      networkType: outbound
+      constraints:
+        - tag: vmworld
+
