@@ -5,6 +5,7 @@
 # Script to move GM objects under a specific location to the default one.
 # This script is neither supported nor endorsed by VMware but meant as an example
 
+import json
 import warnings
 from json import loads, dumps
 from requests import get, patch
@@ -40,6 +41,23 @@ class NsxMgr:
         self.tree = "/global-infra"
         self.path = "/global-manager/api/v1/global-infra"
         self.url = "https://" + self.hostname + self.path
+
+    def print_conf(self, resource_types = ["Domain", "SecurityPolicy", "Group", "Rule"]):
+        filter = "?filter=Type-" + "|".join(resource_types)
+        uri = self.url + filter
+        res = get(  uri,
+                    verify = self.certificate_validation,
+                    auth = HTTPBasicAuth(self.username, self.password)
+                    )
+        print ("Got the following items:")
+        for c in res.json()['children']:
+            print("  Domain: %s" % c['Domain']['display_name'])
+            for child in c['Domain']['children']:
+                for key in child.keys():
+                    if (key == "Group"):
+                        print ("      Group: %s" % child['Group']['display_name'])
+                    if (key == "SecurityPolicy"):
+                        print ("      SecurityPolicy: %s" % child['SecurityPolicy']['display_name'])
 
     def get_conf(self, resource_types = ["Domain","SecurityPolicy","Group","Rule"]):
         """Method to get NSX-T logical configuration leveraging Policy Filters"""
@@ -84,7 +102,7 @@ class NsxMgr:
                 change_dict[domain["id"]] =[]
                 #print(domain["id"])
                 for domain_child in domain["children"]:
-                    for resource_type in resource_types:
+                   for resource_type in resource_types:
                         if resource_type == "Domain":
                             pass
                         else:
@@ -147,6 +165,7 @@ if __name__ == "__main__":
     print ("Connecting to Global Manager: %s", hostname)
     gm = NsxMgr(hostname, username, password)
     
+    gm.print_conf(resource_types)
 
     #backup previous firewall configuration:
     file_backup = open("fwll_backup.json","w")
