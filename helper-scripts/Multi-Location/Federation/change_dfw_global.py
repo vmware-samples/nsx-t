@@ -51,7 +51,7 @@ class NsxMgr:
                     )
         print ("Got the following items:")
         for c in res.json()['children']:
-            if (c['Domain']['display_name'] == 'Global'):
+            if (c['Domain']['display_name'] not in domains):
                 continue
             print("  Domain: %s" % c['Domain']['display_name'])
             for child in c['Domain']['children']:
