@@ -51,6 +51,8 @@ class NsxMgr:
                     )
         print ("Got the following items:")
         for c in res.json()['children']:
+            if (c['Domain']['display_name'] == 'Global'):
+                continue
             print("  Domain: %s" % c['Domain']['display_name'])
             for child in c['Domain']['children']:
                 for key in child.keys():
@@ -144,17 +146,17 @@ class NsxMgr:
         return body
 
 def ask_confirmation():
-    ans = str(input ("Continue with applying the changes? (y/n): ")).lower().strip()
+    ans = str(input ("Continue with changing those objects span to Global in GM configuration ? (y/n): ")).lower().strip()
     try:
         if ans[0] == 'y':
             return True
         elif ans[0] == 'n':
             return False
         else:
-            print ("Invalid Input")
+            print ("Invalid Input. Valid inputs: (y/n)")
             return ask_confirmation()
     except Exception as error:
-        print ("Please enter valid input")
+        print ("Invalid Input. Valid inputs: (y/n)")
         print (error)
         return ask_confirmation()
 
@@ -162,23 +164,21 @@ def ask_confirmation():
 if __name__ == "__main__":
     #Logs against the Global Manager:
     print ("")
-    print ("Connecting to Global Manager: %s", hostname)
+    print ("Connecting to Global Manager: %s" % hostname)
     gm = NsxMgr(hostname, username, password)
     
     gm.print_conf(resource_types)
 
     #backup previous firewall configuration:
     file_backup = open("fwll_backup.json","w")
-    print ("Gathering existing DFW configuration ...")
     file_backup.write(gm.get_conf(resource_types))
-    print ("Writing existing DFW configuration in backup file: fwll_backup.json")
+    print ("Writing existing config with above Groups + DFW-Policies (and its DFW-Rules) with existing span in file: fwll_backup.json")
 
     #generates the configuration creating new objects on default domain, deleting old objects:
-    print ("Changing to Global domain for the following resource_types: ", resource_types)
     conf = gm.generate_body(domains, resource_types)
     file_new = open("fwll_new.json","w")
     file_new.write(conf)
-    print ("New config written into: fwll_new.json")
+    print ("Writing new config with above Groups + DFW-Policies (and its DFW-Rules) with span Global in file: fwll_new.json")
 
     if (ask_confirmation()):
         #Push the new configuration on the Global Manager. This will delete your old objects.
