@@ -186,6 +186,6 @@ if __name__ == "__main__":
         gm.patch_conf(conf)
         print ("Changes applied Successfully!")
     else:
-        print ("Exiting without applying changes. New configuration saved in fwll_new.json")
+        print ("Exiting without applying changes.")
     print ("")
 
