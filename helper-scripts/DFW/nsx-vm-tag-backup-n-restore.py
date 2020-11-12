@@ -120,7 +120,7 @@ def restore_nsx_vm_tags(ip: str, user: str, password: str, backupfile: str):
                 # Grep error_message to identify issue
                 err_msg = err_res_cont["error_message"]
                 print("FAILURE - NSX Tag Restore for VM %s: %s with [%s]"
-                         vm["external_id"],
+                         %(vm["external_id"],
                          err_msg)
                       )
         # If no Tag exists for a VM (UUID) in backup,ignore those VM for restore
