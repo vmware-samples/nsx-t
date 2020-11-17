@@ -1,15 +1,49 @@
 #!/usr/bin/env python
 # Requires Python 3.x
+
+"""
+NSX-T SDK Sample Code
+Copyright 2017-2020 VMware, Inc.  All rights reserved
+The BSD-2 license (the "License") set forth below applies to all
+parts of the NSX-T SDK Sample Code project.  You may not use this
+file except in compliance with the License.
+BSD-2 License
+Redistribution and use in source and binary forms, with or
+without modification, are permitted provided that the following
+conditions are met:
+    Redistributions of source code must retain the above
+    copyright notice, this list of conditions and the
+    following disclaimer.
+    Redistributions in binary form must reproduce the above
+    copyright notice, this list of conditions and the
+    following disclaimer in the documentation and/or other
+    materials provided with the distribution.
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND
+CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+"""
+
+################################################################################
 # Summary: Script to Back and restore NSX DFW policy, rules, groups, Services and context-profiles.
-# Usage: usage: nsx-dfw-backup-n-restore.py [-h] --nsx-mgr-ip IP --operation OPERATION
+# Usage: python nsx-dfw-backup-n-restore.py [-h] --nsx-mgr-ip IP --operation OPERATION
 #                                   [--user USER] [--password PASSWORD]
 #                                   [--backupfileprefix BACKUPFILEPREFIX]
 # Caveat: Prior to 3.1 Services Restore will fail with this script due to
 #                 https://bugzilla.eng.vmware.com/show_bug.cgi?id=2616308
-#         If you do not have user configured service then you are good and can comment out the restore service function.
+#                If you do not have user configured service then you are good and
+#                 can comment out the restore service function.
 # ##############################################################################
 
-################################################################################
 import requests
 from requests.auth import HTTPBasicAuth
 import json
@@ -249,3 +283,34 @@ if __name__ == "__main__":
         restore_nsx_dfw_services(args.backupfileprefix)
         restore_nsx_dfw_context_profiles(args.backupfileprefix)
         restore_nsx_dfw_policy_n_group(args.backupfileprefix)
+
+
+"""
+Sample Script output:
+
+Backup:
+
+    bhatg@bhatg-a02 DFW % python nsx-dfw-backup-n-restore.py --nsx-mgr-ip 10.110.57.244 --operation backup
+
+       NSX DFW L4 services Backup saved as [nsx-services-bkup.json]
+
+       NSX DFW L7 context-profiles Backup saved as [nsx-context-profiles-bkup.json]
+
+       NSX DFW Policy & Group Backup saved as [nsx-policy-n-group-bkup.json]
+
+       NSX DFW Backup has 6 Policy, 37 Rules, 3 Group
+    bhatg@bhatg-a02 DFW %
+
+Restore:
+
+    bhatg@bhatg-a02 DFW % python nsx-dfw-backup-n-restore.py --nsx-mgr-ip 10.110.57.244 --operation restore
+
+       SUCCESS - NSX DFW L4 Services
+
+       SUCCESS - NSX DFW L7 Services Restore
+
+       SUCCESS - NSX DFW Policy & Group Restore: 6 Policy, 37 Rules, 3 Group
+
+    bhatg@bhatg-a02 DFW %
+
+"""
