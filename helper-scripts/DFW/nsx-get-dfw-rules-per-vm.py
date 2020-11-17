@@ -1,7 +1,20 @@
 #!/usr/bin/env python
 # Requires Python 3.x
 # Summary: Script to GET PER VM DFW rules programmed in the datapath.
-# Usecase: Helps to monitor rules against supported rule per vnic (4K).
+# Usecase: Helps to monitor rules against supported rule scale limit per vnic (4K).
+# Usage: python nsx-get-dfw-rules-per-vm.py [-h] --nsx-mgr-ip IP
+#                                           [--user USER]
+#                                           [--password PASSWORD]
+#                                           [--aboverulelimitonly ABOVERULELIMITONLY]
+#                                           [--fwrulelimit FWRULELIMIT]
+# Caveat: This count is very close aproximaion to the rules in the datapath per VNIC with following caveat:
+#         1) It also counts disabled rules.
+#         2) If a rule has TCP & UDP services/ports together, e.g TCP {1,2,3} UDP (5,6}- Script counts as
+#            one but datapath would have 2 rules") one with UDP & TCP port set.
+#         3) If a rule has Multiple L7 Context-Profiles- Script counts as one but datapath would have N rules,
+#            one for each of the L7 profile.
+################################################################################
+
 
 ################################################################################
 import requests

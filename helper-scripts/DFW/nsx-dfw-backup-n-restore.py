@@ -1,7 +1,13 @@
 #!/usr/bin/env python
 # Requires Python 3.x
-# Summary: Script to GET PER VM DFW rules programmed in the datapath.
-# Usecase: Helps to monitor rules against supported rule per vnic (4K).
+# Summary: Script to Back and restore NSX DFW policy, rules, groups, Services and context-profiles.
+# Usage: usage: nsx-dfw-backup-n-restore.py [-h] --nsx-mgr-ip IP --operation OPERATION
+#                                   [--user USER] [--password PASSWORD]
+#                                   [--backupfileprefix BACKUPFILEPREFIX]
+# Caveat: Prior to 3.1 Services Restore will fail with this script due to
+#                 https://bugzilla.eng.vmware.com/show_bug.cgi?id=2616308
+#         If you do not have user configured service then you are good and can comment out the restore service function.
+# ##############################################################################
 
 ################################################################################
 import requests
@@ -25,7 +31,7 @@ parser.add_argument('--user', dest="user",
                    default="admin", required=False)
 parser.add_argument('--password', dest="password",
                    help="NSX Password, default: VMware!23VMware",
-                   default="VMware!23VMware", required=False)
+                   default="Admin!23Admin", required=False)
 parser.add_argument('--backupfileprefix', dest="backupfileprefix",
                    help="Prefix backup file with- default nsx-dfw-<object-type>.json",
                    default="nsx", required=False)
@@ -238,7 +244,8 @@ if __name__ == "__main__":
         backup_nsx_dfw_context_profiles(args.backupfileprefix)
         backup_nsx_dfw_policy_n_group(args.backupfileprefix)
     if "restore" in args.operation:
-        # Some Policy API bug with Service Patch call, so disabling this funtion for now
-        #restore_nsx_dfw_services(args.backupfileprefix)
+        # Prior to 3.1: Policy API bug with Service Patch call https://bugzilla.eng.vmware.com/show_bug.cgi?id=2616308
+        #If you do not have user configured service then you are good and can disable the function.
+        restore_nsx_dfw_services(args.backupfileprefix)
         restore_nsx_dfw_context_profiles(args.backupfileprefix)
         restore_nsx_dfw_policy_n_group(args.backupfileprefix)
