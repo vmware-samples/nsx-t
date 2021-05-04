@@ -1,0 +1,24 @@
+{
+  "ip_pools": [
+    {
+      "display_name": "TEP-pool"
+    }
+  ],
+  "ip-subnets": [
+      {
+        "parent": "TEP-pool",
+        "subnets": {
+            "display_name": "TEP-pool-subnets",
+            "resource_type": "IpAddressPoolStaticSubnet",
+            "allocation_ranges": [
+                {
+                  "start": "192.168.140.101",
+                  "end": "192.168.140.200"
+                }
+            ],
+            "gateway_ip": "192.168.140.1",
+            "cidr": "192.168.140.0/24"
+        }
+      }
+  ]
+}

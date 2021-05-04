@@ -1,0 +1,261 @@
+{
+  "host_transport_nodes": [
+
+    {
+      "host_switch_spec": {
+        "host_switches": [
+          {
+            "host_switch_name": "nvds1",
+            "host_switch_type": "NVDS",
+            "host_switch_mode": "STANDARD",
+            "host_switch_profile_ids": [
+              {
+                "key": "UplinkHostSwitchProfile",
+                "value": "nsx-edge-multiple-vteps-uplink-profile"
+              }
+            ],
+            "pnics": [
+              {
+                "device_name": "fp-eth0",
+                "uplink_name": "uplink-1"
+              },
+              {
+                "device_name": "fp-eth1",
+                "uplink_name": "uplink-2"
+              }
+            ],
+            "ip_assignment_spec": {
+              "ip_pool_id": "TEP-pool",
+              "resource_type": "StaticIpPoolSpec"
+            },
+            "transport_zone_endpoints": [
+              {
+                "transport_zone_id": "nsx-overlay-transportzone"
+              },
+              {
+                "transport_zone_id": "nsx-uplinks-vlan-transportzone"
+              }
+            ]
+          }
+        ],
+        "resource_type": "StandardHostSwitchSpec"
+      },
+      "node_deployment_info": {
+        "deployment_type": "VIRTUAL_MACHINE",
+        "deployment_config": {
+          "vm_deployment_config": {
+            "vc_id": "vCenter",
+            "compute_id": "domain-c2008",
+            "storage_id": "datastore-2025",
+            "host_id": "host-2013",
+            "management_network_id": "dvportgroup-2038",
+            "management_port_subnets": [
+              {
+                "ip_addresses": [
+                  "192.168.110.41"
+                ],
+                "prefix_length": 24
+              }
+            ],
+            "default_gateway_addresses": [
+              "192.168.110.1"
+            ],
+            "hostname": "edgenode-01a.corp.local",
+            "data_network_ids": [
+              "dvportgroup-2039",
+              "dvportgroup-2040"
+            ],
+            "search_domains": [
+              "corp.local"
+            ],
+            "dns_servers": [
+              "192.168.110.10"
+            ],
+            "enable_ssh": true,
+            "allow_ssh_root_login": true,
+            "placement_type": "VsphereDeploymentConfig"
+          },
+          "form_factor": "MEDIUM",
+          "node_user_settings": {
+            "cli_username": "admin",
+            "cli_password": "VMware1!VMware1!",
+            "root_password": "VMware1!VMware1!"
+          }
+        },
+        "node_settings": {
+          "hostname": "edgenode-01a.corp.local",
+          "search_domains": [
+            "corp.local"
+          ],
+          "dns_servers": [
+            "192.168.110.10"
+          ],
+          "enable_ssh": true,
+          "allow_ssh_root_login": true
+        },
+        "resource_type": "EdgeNode",
+        "display_name": "edgenode-01a",
+        "ip_addresses": [
+          "192.168.110.41"
+        ]
+      },
+      "resource_type": "TransportNode",
+      "display_name": "edgenode-01a"
+    },
+    {
+      "host_switch_spec": {
+        "host_switches": [
+          {
+            "host_switch_name": "nvds1",
+            "host_switch_type": "NVDS",
+            "host_switch_mode": "STANDARD",
+            "host_switch_profile_ids": [
+              {
+                "key": "UplinkHostSwitchProfile",
+                "value": "nsx-edge-multiple-vteps-uplink-profile"
+              }
+            ],
+            "pnics": [
+              {
+                "device_name": "fp-eth0",
+                "uplink_name": "uplink-1"
+              },
+              {
+                "device_name": "fp-eth1",
+                "uplink_name": "uplink-2"
+              }
+            ],
+            "ip_assignment_spec": {
+              "ip_pool_id": "TEP-pool",
+              "resource_type": "StaticIpPoolSpec"
+            },
+            "transport_zone_endpoints": [
+              {
+                "transport_zone_id": "nsx-overlay-transportzone"
+              },
+              {
+                "transport_zone_id": "nsx-uplinks-vlan-transportzone"
+              }
+            ]
+          }
+        ],
+        "resource_type": "StandardHostSwitchSpec"
+      },
+      "node_deployment_info": {
+        "deployment_type": "VIRTUAL_MACHINE",
+        "deployment_config": {
+          "vm_deployment_config": {
+            "vc_id": "vCenter",
+            "compute_id": "domain-c2008",
+            "storage_id": "datastore-2025",
+            "host_id": "host-2016",
+            "management_network_id": "dvportgroup-2038",
+            "management_port_subnets": [
+              {
+                "ip_addresses": [
+                  "192.168.110.42"
+                ],
+                "prefix_length": 24
+              }
+            ],
+            "default_gateway_addresses": [
+              "192.168.110.1"
+            ],
+            "hostname": "edgenode-02a.corp.local",
+            "data_network_ids": [
+              "dvportgroup-2039",
+              "dvportgroup-2040"
+            ],
+            "search_domains": [
+              "corp.local"
+            ],
+            "dns_servers": [
+              "192.168.110.10"
+            ],
+            "enable_ssh": true,
+            "allow_ssh_root_login": true,
+            "placement_type": "VsphereDeploymentConfig"
+          },
+          "form_factor": "MEDIUM",
+          "node_user_settings": {
+            "cli_username": "admin",
+            "cli_password": "VMware1!VMware1!",
+            "root_password": "VMware1!VMware1!"
+          }
+        },
+        "node_settings": {
+          "hostname": "edgenode-02a.corp.local",
+          "search_domains": [
+            "corp.local"
+          ],
+          "dns_servers": [
+            "192.168.110.10"
+          ],
+          "enable_ssh": true,
+          "allow_ssh_root_login": true
+        },
+        "resource_type": "EdgeNode",
+        "display_name": "edgenode-02a",
+        "ip_addresses": [
+          "192.168.110.42"
+        ]
+      },
+      "resource_type": "TransportNode",
+      "display_name": "edgenode-02a"
+    },
+    {
+        "resource_type": "TransportNode",
+        "display_name": "kvmcomp-01a",
+        "description": "KVM Host Transport Node 01",
+        "host_switch_spec": {
+            "resource_type": "StandardHostSwitchSpec",
+            "host_switches": [
+                {
+                    "host_switch_type": "NVDS",
+                    "host_switch_mode": "STANDARD",
+                    "host_switch_profile_ids": [
+                        {
+                            "value": "nsx-default-uplink-hostswitch-profile",
+                             "key": "UplinkHostSwitchProfile"
+                        },
+                        {
+                            "value": "LLDP [Send Packet Disabled]",
+                            "key": "LldpHostSwitchProfile"
+                        }
+                    ],
+                    "host_switch_name": "nvds1",
+                    "pnics": [
+                        {
+                            "device_name": "eth1",
+                            "uplink_name": "uplink-1"
+                        }
+                    ],
+                    "ip_assignment_spec": {
+                        "resource_type": "StaticIpPoolSpec",
+                        "ip_pool_id": "TEP-pool"
+                    },
+                    "transport_zone_endpoints": [
+                      {
+                        "transport_zone_id": "nsx-overlay-transportzone"
+                      },
+                      {
+                        "transport_zone_id": "nsx-vlan-transportzone"
+                      }
+                    ]
+                }
+            ]
+        },
+        "node_deployment_info": {
+            "resource_type": "HostNode",
+            "display_name": "kvmcomp-01a",
+            "ip_addresses": [ "192.168.130.151" ],
+            "os_type": "UBUNTUKVM",
+            "host_credential": {
+                "username": "root",
+                "password": "VMware1!",
+                "thumbprint": ""
+            }
+        }
+    }
+	]
+}

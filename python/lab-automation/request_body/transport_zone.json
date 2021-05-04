@@ -1,0 +1,12 @@
+{
+  "transport_zones": [
+    {
+      "display_name": "nsx-uplinks-vlan-transportzone",
+      "transport_type": "VLAN",
+            "uplink_teaming_policy_names": [
+        "teaming-1",
+        "teaming-2"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+    "compute-clusters": [
+        {
+            "resource_type": "TransportNodeCollection",
+            "display_name": "TransportNodeCollection-1",
+            "description": "Transport Node Collections 1",
+            "compute_collection_id": "Compute-Cluster",
+            "transport_node_profile_id": "compute-TNP"
+        }
+    ]
+} 

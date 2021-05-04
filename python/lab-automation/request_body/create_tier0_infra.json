@@ -1,0 +1,324 @@
+{
+  "tier0s": [
+    {
+      "ha_mode": "ACTIVE_ACTIVE",
+      "failover_mode": "NON_PREEMPTIVE",
+      "default_rule_logging": false,
+      "disable_firewall": false,
+      "resource_type": "Tier0",
+      "id": "T0-GW",
+      "display_name": "T0-GW"
+    }
+  ],
+  "infra-tier0s": [
+    {
+      "resource_type": "Infra",
+      "id": "infra",
+      "display_name": "infra",
+      "children": [
+        {
+          "resource_type": "ChildTier0",
+          "marked_for_delete": VAR_MARKED_FOR_DELETE,
+          "Tier0": {
+    
+            "ha_mode": "ACTIVE_ACTIVE",
+            "failover_mode": "NON_PREEMPTIVE",
+    
+            "force_whitelisting": false,
+            "default_rule_logging": false,
+            "disable_firewall": false,
+            "resource_type": "Tier0",
+            "id": "T0-GW-1",
+            "display_name": "T0-GW",
+         
+            "children": [
+              {
+                "LocaleServices": {
+                  "route_redistribution_config": {
+                    "bgp_enabled": true,
+                    "enabled": true,
+                    "redistribution_rules": [
+                      {
+                        "name": "redist",
+                        "route_redistribution_types": [
+                          "TIER0_CONNECTED",
+                          "TIER1_NAT",
+                          "TIER1_CONNECTED",
+                          "TIER0_STATIC"
+                        ]
+                      }
+                    ]
+                  },
+                  "edge_cluster_path": "VAR_EDGE_CLUSTER_PATH",
+                  "resource_type": "LocaleServices",
+                  "id": "ls1",
+                  "children": [
+                    {
+                      "Tier0Interface": {
+                        "urpf_mode": "STRICT",
+                        "edge_path": "VAR_EDGE2_PATH",
+                        "segment_path": "/infra/segments/left_seg",
+                        "type": "EXTERNAL",
+                        "multicast": {
+                          "enabled": false
+                        },
+                        "resource_type": "Tier0Interface",
+                        "id": "edge2-left",
+                        "display_name": "edge2-left",
+                        "subnets": [
+                          {
+                            "ip_addresses": [
+                              "192.168.240.12"
+                            ],
+                            "prefix_len": 24
+                          },
+                          {
+                            "ip_addresses": [
+                              "2240::12"
+                            ],
+                            "prefix_len": 64
+                          }
+                        ]
+                      },
+                      "marked_for_delete": VAR_MARKED_FOR_DELETE,
+                      "resource_type": "ChildTier0Interface"
+                    },
+                    {
+                      "Tier0Interface": {
+                        "urpf_mode": "STRICT",
+                        "edge_path": "VAR_EDGE2_PATH",
+                        "segment_path": "/infra/segments/right_seg",
+                        "type": "EXTERNAL",
+                        "multicast": {
+                          "enabled": false
+                        },
+                        "resource_type": "Tier0Interface",
+                        "id": "edge2-right",
+                        "display_name": "edge2-right",
+                        "subnets": [
+                          {
+                            "ip_addresses": [
+                              "192.168.250.12"
+                            ],
+                            "prefix_len": 24
+                          },
+                          {
+                            "ip_addresses": [
+                              "2250::12"
+                            ],
+                            "prefix_len": 64
+                          }
+                        ]
+                      },
+                      "marked_for_delete": VAR_MARKED_FOR_DELETE,
+                      "resource_type": "ChildTier0Interface"
+                    },
+                    {
+                      "Tier0Interface": {
+                        "urpf_mode": "STRICT",
+                        "edge_path": "VAR_EDGE1_PATH",
+                        "segment_path": "/infra/segments/left_seg",
+                        "type": "EXTERNAL",
+                        "multicast": {
+                          "enabled": false
+                        },
+                        "resource_type": "Tier0Interface",
+                        "id": "edge1-left",
+                        "display_name": "edge1-left",
+                        "subnets": [
+                          {
+                            "ip_addresses": [
+                              "192.168.240.11"
+                            ],
+                            "prefix_len": 24
+                          },
+                          {
+                            "ip_addresses": [
+                              "2240::11"
+                            ],
+                            "prefix_len": 64
+                          }
+                        ]
+                      },
+                      "marked_for_delete": VAR_MARKED_FOR_DELETE,
+                      "resource_type": "ChildTier0Interface"
+                    },
+                    {
+                      "Tier0Interface": {
+                        "urpf_mode": "STRICT",
+                        "edge_path": "VAR_EDGE1_PATH",
+                        "segment_path": "/infra/segments/right_seg",
+                        "type": "EXTERNAL",
+                        "multicast": {
+                          "enabled": false
+                        },
+                        "resource_type": "Tier0Interface",
+                        "id": "edge1-right",
+                        "display_name": "edge1-right",
+                        "subnets": [
+                          {
+                            "ip_addresses": [
+                              "192.168.250.11"
+                            ],
+                            "prefix_len": 24
+                          },
+                          {
+                            "ip_addresses": [
+                              "2250::11"
+                            ],
+                            "prefix_len": 64
+                          }
+                        ]
+                      },
+                      "marked_for_delete": VAR_MARKED_FOR_DELETE,
+                      "resource_type": "ChildTier0Interface"
+                    },
+                    {
+                      "BgpRoutingConfig": {
+                        "local_as_num": "100",
+                        "enabled": true,
+                        "ecmp": true,
+                        "multipath_relax": true,
+                        "inter_sr_ibgp": true,
+                        "graceful_restart_config": {
+                          "mode": "HELPER_ONLY",
+                          "timer": {
+                            "restart_timer": 180,
+                            "stale_route_timer": 600
+                          }
+                        },
+                        "resource_type": "BgpRoutingConfig",
+                        "id": "bgp",
+                        "display_name": "bgp",
+                        "children": [
+                          {
+                            "BgpNeighborConfig": {
+                              "source_addresses": [
+                                "2250::11",
+                                "2250::12"
+                              ],
+                              "neighbor_address": "2250::1",
+                              "remote_as_num": "200",
+                              "password": "",
+                              "route_filtering": [
+                                {
+                                  "enabled": true,
+                                  "address_family": "IPV6"
+                                }
+                              ],
+                              "keep_alive_time": 60,
+                              "hold_down_time": 180,
+                              "allow_as_in": false,
+                              "maximum_hop_limit": 1,
+                              "resource_type": "BgpNeighborConfig",
+                              "display_name": "bgp1",
+                              "id": "bgp1"
+                            },
+                            "marked_for_delete": VAR_MARKED_FOR_DELETE,
+                            "resource_type": "ChildBgpNeighborConfig"
+                          },
+                          {
+                            "BgpNeighborConfig": {
+                              "source_addresses": [
+                                "192.168.240.11",
+                                "192.168.240.12"
+                              ],
+                              "neighbor_address": "192.168.240.1",
+                              "remote_as_num": "200",
+                              "password": "",
+                              "route_filtering": [
+                                {
+                                  "enabled": true,
+                                  "address_family": "IPV4"
+                                }
+                              ],
+                              "keep_alive_time": 60,
+                              "hold_down_time": 180,
+                              "bfd": {
+                                "enabled": true,
+                                "interval": 500,
+                                "multiple": 3
+                              },
+                              "allow_as_in": false,
+                              "maximum_hop_limit": 1,
+                              "resource_type": "BgpNeighborConfig",
+                              "display_name": "bgp2",
+                              "id": "bgp2"
+                            },
+                            "marked_for_delete": VAR_MARKED_FOR_DELETE,
+                            "resource_type": "ChildBgpNeighborConfig"
+                          },
+                          {
+                            "BgpNeighborConfig": {
+                              "source_addresses": [
+                                "192.168.250.11",
+                                "192.168.250.12"
+                              ],
+                              "neighbor_address": "192.168.250.1",
+                              "remote_as_num": "200",
+                              "password": "",
+                              "route_filtering": [
+                                {
+                                  "enabled": true,
+                                  "address_family": "IPV4"
+                                }
+                              ],
+                              "keep_alive_time": 60,
+                              "hold_down_time": 180,
+                              "bfd": {
+                                "enabled": true,
+                                "interval": 500,
+                                "multiple": 3
+                              },
+                              "allow_as_in": false,
+                              "maximum_hop_limit": 1,
+                              "resource_type": "BgpNeighborConfig",
+                              "display_name": "bgp3",
+                              "id": "bgp3"
+                            },
+                            "marked_for_delete": VAR_MARKED_FOR_DELETE,
+                            "resource_type": "ChildBgpNeighborConfig"
+                          },
+                          {
+                            "BgpNeighborConfig": {
+                              "source_addresses": [
+                                "2240::11",
+                                "2240::12"
+                              ],
+                              "neighbor_address": "2240::1",
+                              "remote_as_num": "200",
+                              "password": "",
+                              "route_filtering": [
+                                {
+                                  "enabled": true,
+                                  "address_family": "IPV6"
+                                }
+                              ],
+                              "keep_alive_time": 60,
+                              "hold_down_time": 180,
+                              "allow_as_in": false,
+                              "maximum_hop_limit": 1,
+                              "resource_type": "BgpNeighborConfig",
+                              "display_name": "bgp4",
+                              "id": "bgp4"
+                            },
+                            "marked_for_delete": VAR_MARKED_FOR_DELETE,
+                            "resource_type": "ChildBgpNeighborConfig"
+                          }
+                        ]
+                      },
+                      "marked_for_delete": VAR_MARKED_FOR_DELETE,
+                      "resource_type": "ChildBgpRoutingConfig"
+                    }
+                  ]
+                },
+                "marked_for_delete": VAR_MARKED_FOR_DELETE,
+                "resource_type": "ChildLocaleServices"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
