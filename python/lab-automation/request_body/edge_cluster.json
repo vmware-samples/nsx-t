@@ -1,0 +1,24 @@
+{
+	"edge_clusters": [
+		{
+			"display_name": "EdgeCluster",
+            "description": "EdgeCluster",
+            "cluster_profile_bindings": [
+                {
+                    "profile_id": "nsx-default-edge-high-availability-profile",
+                    "resource_type": "EdgeHighAvailabilityProfile"
+                }
+            ],
+            "members": [
+                {
+                    "display_name": "edgenode-01a",
+                    "transport_node_id": ""
+                },
+                {
+                    "display_name": "edgenode-02a",
+                    "transport_node_id": ""
+                }
+            ]
+		}
+	]
+}

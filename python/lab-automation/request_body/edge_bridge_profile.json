@@ -1,0 +1,14 @@
+{
+	"edge-bridge-profile": [
+		{
+            "display_name": "BridgeProfile",
+            "description": "Bridge Endpoint Profile 1",
+            "edge_cluster_id" : "EdgeCluster",
+            "edge_cluster_member_indexes" : [
+            	"edgenode-01a",
+            	"edgenode-02a"
+            ],
+            "failover_mode" : "PREEMPTIVE"
+		}
+	]
+}

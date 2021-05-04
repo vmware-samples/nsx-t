@@ -1,0 +1,40 @@
+{
+	"transport_node_profiles": [{
+		"display_name": "compute-TNP",
+		"resource_type": "TransportNodeProfile",
+		"host_switch_spec": {
+			"resource_type": "StandardHostSwitchSpec",
+			"host_switches": [{
+				"host_switch_name": "LabVDS",
+				"host_switch_id": "50 13 e9 c3 85 4e 62 c6-37 72 76 50 b2 b4 64 b9",
+				"host_switch_type": "VDS",
+				"host_switch_mode": "STANDARD",
+				"host_switch_profile_ids": [{
+					"key": "UplinkHostSwitchProfile",
+					"value": "0a26d126-7116-11e5-9d70-feff819cdc9f"
+				}],
+				"pnics": [],
+				"uplinks": [{
+						"vds_uplink_name": "Uplink 1",
+						"uplink_name": "uplink-1"
+					},
+					{
+						"vds_uplink_name": "Uplink 2",
+						"uplink_name": "uplink-2"
+					}
+				],
+				"ip_assignment_spec": {
+					"resource_type": "StaticIpPoolSpec",
+					"ip_pool_id": "TEP-pool"
+				},
+				"transport_zone_endpoints": [{
+						"transport_zone_id": "1b3a2f36-bfd1-443e-a0f6-4de01abc963e"
+					},
+					{
+						"transport_zone_id": "a95c914d-748d-497c-94ab-10d4647daeba"
+					}
+				]
+			}]
+		}
+	}]
+}

@@ -1,0 +1,28 @@
+{
+	"segments": [
+    {
+      "display_name": "left-seg",
+      "id": "left-seg",
+      "transport_zone_path": "nsx-uplinks-vlan-transportzone",
+      "vlan_ids": [
+        "240"
+      ],
+      "advanced_config": {
+        "connectivity": "ON",
+        "uplink_teaming_policy_name": "teaming-1"
+      }
+    },
+    {
+      "display_name": "right-seg",
+      "id": "right-seg",
+      "transport_zone_path": "nsx-uplinks-vlan-transportzone",
+      "vlan_ids": [
+        "250"
+      ],
+      "advanced_config": {
+        "connectivity": "ON",
+        "uplink_teaming_policy_name": "teaming-2"
+      }
+    }
+	]
+}

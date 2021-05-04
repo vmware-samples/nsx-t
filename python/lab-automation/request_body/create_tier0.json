@@ -1,0 +1,196 @@
+{
+  "tier0s": [
+    {
+      "ha_mode": "ACTIVE_ACTIVE",
+      "failover_mode": "NON_PREEMPTIVE",
+      "default_rule_logging": false,
+      "disable_firewall": false,
+      "resource_type": "Tier0",
+      "id": "T0-GW",
+      "display_name": "T0-GW"
+    }
+  ],
+
+  "localeservices": [
+    {
+      "route_redistribution_config": {
+        "bgp_enabled": true,
+        "redistribution_rules": [
+          {
+            "name": "redist",
+            "route_redistribution_types": [
+              "TIER0_CONNECTED",
+              "TIER1_NAT",
+              "TIER1_CONNECTED",
+              "TIER0_STATIC"
+            ]
+          }
+        ]
+      },
+      "edge_cluster_path": "",
+      "resource_type": "LocaleServices",
+      "id": "locale-service-1",
+      "display_name": "locale-service-1"
+    }
+  ],
+
+  "interfaces": [
+    {
+      "id": "edge1-left",
+      "display_name": "edge1-left",
+      "edge_path": "EDGE1_PATH",
+      "segment_path": "/infra/segments/left-seg",
+      "type": "EXTERNAL",
+      "multicast": {
+        "enabled": false
+      },
+      "resource_type": "Tier0Interface",
+      "subnets": [
+        {
+          "ip_addresses": [
+            "192.168.240.11"
+          ],
+          "prefix_len": 24
+        },
+        {
+          "ip_addresses": [
+            "2240::11"
+          ],
+          "prefix_len": 64
+        }
+      ]
+    },
+    {
+      "id": "edge1-right",
+      "display_name": "edge1-right",
+      "edge_path": "EDGE1_PATH",
+      "segment_path": "/infra/segments/right-seg",
+      "type": "EXTERNAL",
+      "multicast": {
+        "enabled": false
+      },
+      "resource_type": "Tier0Interface",
+      "subnets": [
+        {
+          "ip_addresses": [
+            "192.168.250.11"
+          ],
+          "prefix_len": 24
+        },
+        {
+          "ip_addresses": [
+            "2250::11"
+          ],
+          "prefix_len": 64
+        }
+      ]
+    },
+    {
+      "id": "edge2-left",
+      "display_name": "edge2-left",
+      "edge_path": "EDGE2_PATH",
+      "segment_path": "/infra/segments/left-seg",
+      "type": "EXTERNAL",
+      "multicast": {
+        "enabled": false
+      },
+      "resource_type": "Tier0Interface",
+      "subnets": [
+        {
+          "ip_addresses": [
+            "192.168.240.12"
+          ],
+          "prefix_len": 24
+        },
+        {
+          "ip_addresses": [
+            "2240::12"
+          ],
+          "prefix_len": 64
+        }
+      ]
+    },
+    {
+      "id": "edge2-right",
+      "display_name": "edge2-right",
+      "edge_path": "EDGE2_PATH",
+      "segment_path": "/infra/segments/right-seg",
+      "type": "EXTERNAL",
+      "multicast": {
+        "enabled": false
+      },
+      "resource_type": "Tier0Interface",
+      "subnets": [
+        {
+          "ip_addresses": [
+            "192.168.250.12"
+          ],
+          "prefix_len": 24
+        },
+        {
+          "ip_addresses": [
+            "2250::12"
+          ],
+          "prefix_len": 64
+        }
+      ]
+    }
+  ],
+
+  "bgpconfig": [
+    {
+      "local_as_num": "100",
+      "enabled": true,
+      "resource_type": "BgpRoutingConfig",
+      "id": "bgp",
+      "display_name": "bgp"
+    }
+  ],
+
+  "bgpneighbors": [
+    {
+      "source_addresses": [
+        "192.168.240.11",
+        "192.168.240.12"
+      ],
+      "neighbor_address": "192.168.240.1",
+      "remote_as_num": "200",
+      "resource_type": "BgpNeighborConfig",
+      "id": "bgp1",
+      "display_name": "bgp1"
+    },
+    {
+      "source_addresses": [
+        "192.168.250.11",
+        "192.168.250.12"
+      ],
+      "neighbor_address": "192.168.250.1",
+      "remote_as_num": "200",
+      "resource_type": "BgpNeighborConfig",
+      "id": "bgp2",
+      "display_name": "bgp2"
+    },
+    {
+      "source_addresses": [
+        "2240::11",
+        "2240::12"
+      ],
+      "neighbor_address": "2240::1",
+      "remote_as_num": "200",
+      "resource_type": "BgpNeighborConfig",
+      "id": "bgp3",
+      "display_name": "bgp3"
+    },
+    {
+      "source_addresses": [
+        "2250::11",
+        "2250::12"
+      ],
+      "neighbor_address": "2250::1",
+      "remote_as_num": "200",
+      "resource_type": "BgpNeighborConfig",
+      "id": "bgp4",
+      "display_name": "bgp4"
+    }
+  ]
+}

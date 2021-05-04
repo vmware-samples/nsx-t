@@ -1,0 +1,14 @@
+{
+    "compute_managers": [
+        {
+            "display_name": "vCenter",
+            "server": "vcsa-01a.corp.local",
+            "origin_type": "vCenter",
+            "credential": {
+                "credential_type": "UsernamePasswordLoginCredential",
+                "username": "administrator@vsphere.local",
+                "password": "VMware1!"
+            }
+        }
+    ]
+}

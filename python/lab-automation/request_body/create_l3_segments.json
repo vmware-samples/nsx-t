@@ -1,0 +1,64 @@
+{
+  "segments": [
+    {
+      "display_name": "web-seg",
+      "transport_zone_path": "nsx-overlay-transportzone",
+      "connectivity_path": "/infra/tier-1s/T1-GW",
+      "subnets": [
+        {
+          "gateway_address": "172.16.10.1/24",
+          "network": "172.16.10.0/24"
+        },
+        {
+          "gateway_address": "2001::1/64",
+          "network": "2001::/64"
+        }
+      ]
+    },
+    {
+      "display_name": "app-seg",
+      "transport_zone_path": "nsx-overlay-transportzone",
+      "connectivity_path": "/infra/tier-1s/T1-GW",
+      "subnets": [
+        {
+          "gateway_address": "172.16.20.1/24",
+          "network": "172.16.20.0/24"
+        },
+        {
+          "gateway_address": "2002::1/64",
+          "network": "2002::/64"
+        }
+      ]
+    },
+    {
+      "display_name": "db-seg",
+      "transport_zone_path": "nsx-overlay-transportzone",
+      "connectivity_path": "/infra/tier-1s/T1-GW",
+      "subnets": [
+        {
+          "gateway_address": "172.16.30.1/24",
+          "network": "172.16.30.0/24"
+        },
+        {
+          "gateway_address": "2003::1/64",
+          "network": "2003::/64"
+        }
+      ]
+    },
+    {
+      "display_name": "vm-seg",
+      "transport_zone_path": "nsx-overlay-transportzone",
+      "connectivity_path": "/infra/tier-1s/T1-GW2",
+      "subnets": [
+        {
+          "gateway_address": "172.16.101.1/24",
+          "network": "172.16.101.0/24"
+        },
+        {
+          "gateway_address": "2101::1/64",
+          "network": "2101::/64"
+        }
+      ]
+    }
+  ]
+}

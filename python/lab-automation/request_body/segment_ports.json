@@ -1,0 +1,22 @@
+{
+	"segment-ports": [
+		{
+            "attachment": {
+                "id": ""
+            },
+            "resource_type": "SegmentPort",
+            "id": "web-03a",
+            "display_name": "web-03a",
+            "path": "/infra/segments/web-seg/ports/web-03a"
+        },
+        {
+        	"attachment": {
+                "id": ""
+            },
+            "resource_type": "SegmentPort",
+            "id": "db-01a",
+            "display_name": "db-01a",
+            "path": "/infra/segments/db-seg/ports/db-01a"
+        }
+	]
+}
