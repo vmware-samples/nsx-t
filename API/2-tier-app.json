@@ -1,0 +1,223 @@
+{
+  "resource_type" : "Infra",
+  "id" : "infra",
+  "display_name" : "infra",
+  "children" : [ {
+    "Tier1" : {
+      "tier0_path" : "/infra/tier-0s/T0-Paris",
+      "failover_mode" : "NON_PREEMPTIVE",
+      "enable_standby_relocation" : false,
+      "route_advertisement_types" : [ "TIER1_STATIC_ROUTES", "TIER1_NAT", "TIER1_DNS_FORWARDER_IP", "TIER1_IPSEC_LOCAL_ENDPOINT", "TIER1_LB_SNAT", "TIER1_CONNECTED", "TIER1_LB_VIP" ],
+      "force_whitelisting" : false,
+      "default_rule_logging" : false,
+      "disable_firewall" : false,
+      "pool_allocation" : "ROUTING",
+      "resource_type" : "Tier1",
+      "id" : "T1-Paris",
+      "display_name" : "T1-Paris",
+      "children" : [ {
+        "LocaleServices" : {
+          "edge_cluster_path" : "/infra/sites/default/enforcement-points/default/edge-clusters/3c4006a1-12ea-48c3-9a94-ee52b5c44d34",
+          "resource_type" : "LocaleServices",
+          "id" : "default",
+          "display_name" : "default"
+        },
+        "resource_type" : "ChildLocaleServices",
+        "id" : "default",
+        "marked_for_delete" : {{markedfordelete}}
+      }, {
+        "PolicyNat" : {
+          "nat_type" : "USER",
+          "resource_type" : "PolicyNat",
+          "id" : "USER",
+          "display_name" : "USER",
+          "children" : [ {
+            "PolicyNatRule" : {
+              "action" : "DNAT",
+              "destination_network" : "88.88.88.88",
+              "translated_network" : "172.16.10.11",
+              "enabled" : true,
+              "logging" : false,
+              "firewall_match" : "MATCH_INTERNAL_ADDRESS",
+              "resource_type" : "PolicyNatRule",
+              "id" : "nat-rule",
+              "display_name" : "NAT-WEB01"
+            },
+            "resource_type" : "ChildPolicyNatRule",
+            "id" : "nat-rule"
+          } ]
+        },
+        "resource_type" : "ChildPolicyNat",
+        "id" : "USER",
+        "marked_for_delete" : {{markedfordelete}}
+      } ]
+    },
+    "resource_type" : "ChildTier1",
+    "id" : "T1-Paris",
+    "marked_for_delete" : {{markedfordelete}}
+  }, {
+    "Segment" : {
+      "subnets" : [ {
+        "gateway_address" : "172.16.10.1/24",
+        "network" : "172.16.10.0/24"
+      } ],
+      "connectivity_path" : "/infra/tier-1s/T1-Paris",
+      "transport_zone_path" : "/infra/sites/default/enforcement-points/default/transport-zones/1b3a2f36-bfd1-443e-a0f6-4de01abc963e",
+      "advanced_config" : {
+        "connectivity" : "ON"
+      },
+      "resource_type" : "Segment",
+      "id" : "web-seg",
+      "display_name" : "web-seg"
+    },
+    "resource_type" : "ChildSegment",
+    "id" : "web-seg",
+    "marked_for_delete" : {{markedfordelete}}
+  }, {
+    "Segment" : {
+      "subnets" : [ {
+        "gateway_address" : "172.16.20.1/24",
+        "network" : "172.16.20.0/24"
+      } ],
+      "connectivity_path" : "/infra/tier-1s/T1-Paris",
+      "transport_zone_path" : "/infra/sites/default/enforcement-points/default/transport-zones/1b3a2f36-bfd1-443e-a0f6-4de01abc963e",
+      "advanced_config" : {
+        "connectivity" : "ON"
+      },
+      "resource_type" : "Segment",
+      "id" : "db-seg",
+      "display_name" : "db-seg"
+    },
+    "resource_type" : "ChildSegment",
+    "id" : "db-seg",
+    "marked_for_delete" : {{markedfordelete}}
+  }, {
+    "Domain" : {
+      "resource_type" : "Domain",
+      "id" : "default",
+      "display_name" : "default",
+      "children" : [ {
+        "Group" : {
+          "expression" : [ {
+            "ip_addresses" : [ "192.168.110.10" ],
+            "resource_type" : "IPAddressExpression"
+          } ],
+          "resource_type" : "Group",
+          "id" : "Mgmt-IP-ipset",
+          "display_name" : "Mgmt-IP-ipset"
+        },
+        "resource_type" : "ChildGroup",
+        "id" : "Mgmt-IP-ipset",
+        "marked_for_delete" : {{markedfordelete}}
+      }, {
+        "Group" : {
+          "expression" : [ {
+            "member_type" : "VirtualMachine",
+            "key" : "Name",
+            "operator" : "STARTSWITH",
+            "value" : "DB",
+            "resource_type" : "Condition"
+          } ],
+          "resource_type" : "Group",
+          "id" : "DB-VM-Group",
+          "display_name" : "DB-VM-Group"
+        },
+        "resource_type" : "ChildGroup",
+        "id" : "DB-VM-Group",
+        "marked_for_delete" : {{markedfordelete}}
+      }, {
+        "Group" : {
+          "expression" : [ {
+            "member_type" : "VirtualMachine",
+            "key" : "Name",
+            "operator" : "STARTSWITH",
+            "value" : "Web",
+            "resource_type" : "Condition"
+          } ],
+          "resource_type" : "Group",
+          "id" : "Web-VM-Group",
+          "display_name" : "Web-VM-Group"
+        },
+        "resource_type" : "ChildGroup",
+        "id" : "Web-VM-Group",
+        "marked_for_delete" : {{markedfordelete}}
+      }, {
+        "SecurityPolicy" : {
+          "resource_type" : "SecurityPolicy",
+          "id" : "Management+Access",
+          "display_name" : "Management Access",
+          "category" : "Infrastructure",
+          "children" : [ {
+            "Rule" : {
+              "action" : "ALLOW",
+              "resource_type" : "Rule",
+              "id" : "ManagementSSH+ICMP",
+              "display_name" : "Management SSH + ICMP",
+              "source_groups" : [ "/infra/domains/default/groups/Mgmt-IP-ipset" ],
+              "destination_groups" : [ "/infra/domains/default/groups/DB-VM-Group", "/infra/domains/default/groups/Web-VM-Group" ],
+              "services" : [ "/infra/services/SSH", "/infra/services/ICMP-ALL" ],
+              "scope" : [ "/infra/domains/default/groups/Web-VM-Group", "/infra/domains/default/groups/DB-VM-Group" ]
+            },
+            "resource_type" : "ChildRule",
+            "id" : "ManagementSSH+ICMP"
+          } ]
+        },
+        "resource_type" : "ChildSecurityPolicy",
+        "id" : "Management+Access",
+        "marked_for_delete" : {{markedfordelete}}
+      },{
+        "SecurityPolicy" : {
+          "logging_enabled" : false,
+          "resource_type" : "SecurityPolicy",
+          "id" : "2Tier+App",
+          "display_name" : "2Tier App",
+          "category" : "Application",
+          "children" : [{
+            "Rule" : {
+              "action" : "REJECT",
+              "resource_type" : "Rule",
+              "id" : "DenyAll",
+              "display_name" : "Deny All",
+              "source_groups" : [ "ANY" ],
+              "destination_groups" : [ "/infra/domains/default/groups/DB-VM-Group", "/infra/domains/default/groups/Web-VM-Group" ],
+              "services" : [ "ANY" ],
+              "scope" : [ "ANY" ]
+            },
+            "resource_type" : "ChildRule",
+            "id" : "DenyAll"
+          },  {
+            "Rule" : {
+              "action" : "ALLOW",
+              "resource_type" : "Rule",
+              "id" : "AnytoWeb",
+              "display_name" : "Any to Web",
+              "source_groups" : [ "ANY" ],
+              "destination_groups" : [ "/infra/domains/default/groups/Web-VM-Group" ],
+              "services" : [ "/infra/services/ICMP-ALL", "/infra/services/HTTPS" ],
+              "scope" : [ "/infra/domains/default/groups/Web-VM-Group", "/infra/domains/default/groups/DB-VM-Group" ]
+            },
+            "resource_type" : "ChildRule",
+            "id" : "AnytoWeb"
+          }, {
+            "Rule" : {
+              "action" : "ALLOW",
+              "resource_type" : "Rule",
+              "id" : "WebtoDB",
+              "display_name" : "Web to DB",
+              "source_groups" : [ "/infra/domains/default/groups/Web-VM-Group" ],
+              "destination_groups" : [ "/infra/domains/default/groups/DB-VM-Group" ],
+              "services" : [ "/infra/services/MySQL" ],
+              "scope" : [ "/infra/domains/default/groups/Web-VM-Group", "/infra/domains/default/groups/DB-VM-Group" ]
+            },
+            "resource_type" : "ChildRule",
+            "id" : "WebtoDB"
+          } ]
+        },
+        "resource_type" : "ChildSecurityPolicy",
+        "id" : "2Tier+App",
+        "marked_for_delete" : {{markedfordelete}}
+      } ]
+    },
+    "resource_type": "ChildDomain"
+  } ]
+}
