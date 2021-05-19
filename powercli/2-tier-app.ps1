@@ -133,7 +133,7 @@ function createDFWSecurityPolicy($n, $PolicyName, $Category, $RuleName, $SourceG
     $destPath = @()
     foreach ($name in $DestinationGroups) {
         if ($name -eq "ANY") {
-            $sourcePath = @("ANY")
+            $destPath = @("ANY")
         } else {
             $g = ($groups.list('default').results | where {$_.display_name -eq $name})
             $destPath = $destPath + $g.path
@@ -265,6 +265,6 @@ if ($args[0] -eq "delete") {
     createDFWSecurityPolicy $n "Management Access" "Infrastructure" "Management SSH + ICMP" @("Mgmt-IP-ipset") @("DB-VM-Group", "Web-VM-Group") @("SSH", "ICMP ALL") @("DB-VM-Group", "Web-VM-Group") "ALLOW"
     createDFWSecurityPolicy $n "2Tier App" "Application" "Any to Web" @("ANY") @("Web-VM-Group") @("ICMP ALL", "HTTPS") @("DB-VM-Group", "Web-VM-Group") "ALLOW"
     createDFWSecurityPolicy $n "2Tier App" "Application" "Web to DB" @("Web-VM-Group") @("DB-VM-Group") @("MYSQL") @("DB-VM-Group", "Web-VM-Group") "ALLOW"
-    createDFWSecurityPolicy $n "2Tier App" "Application" "Deny All" @("ANY") @("Web-VM-Group", "DB-VM-Group") @("ANY") @("ANY") "REJECT"
+    createDFWSecurityPolicy $n "2Tier App" "Application" "Deny All" @("ANY") @("ANY") @("ANY") @("Web-VM-Group", "DB-VM-Group") "REJECT"
 }
 
