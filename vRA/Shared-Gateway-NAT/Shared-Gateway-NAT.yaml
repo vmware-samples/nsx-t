@@ -1,0 +1,51 @@
+formatVersion: 1
+inputs: {}
+resources:
+  DNAT_Rule_1:
+    type: Cloud.NSX.Nat
+    properties:
+      name: DNAT Rule
+      gateway: '${resource.Gateway_1.id}'
+      natRules:
+        - translatedInstance: '${resource.Cloud_Machine_1.networks[0].id}'
+          index: 0
+          protocol: TCP
+          kind: NAT44
+          type: DNAT
+          sourceIPs: any
+          sourcePorts: 80
+          translatedPorts: 8080
+          destinationPorts: 8080
+          description: add
+  Cloud_Machine_1:
+    type: Cloud.Machine
+    properties:
+      image: ubuntu
+      flavor: Small
+      networks:
+        - network: '${resource.Network_1.id}'
+  Cloud_Machine_2:
+    type: Cloud.Machine
+    properties:
+      image: ubuntu
+      flavor: Small
+      networks:
+        - network: '${resource.Network_2.id}'
+  Gateway_1:
+    type: Cloud.NSX.Gateway
+    properties:
+      networks:
+        - '${resource.Network_1.id}'
+        - '${resource.Network_2.id}'
+  Network_1:
+    type: Cloud.NSX.Network
+    properties:
+      networkType: outbound
+      constraints:
+        - tag: 'net:outbound'
+  Network_2:
+    type: Cloud.NSX.Network
+    properties:
+      networkType: outbound
+      constraints:
+        - tag: 'net:outbound'

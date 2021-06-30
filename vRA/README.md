@@ -2,22 +2,18 @@
 
 ## Overview
 
-Creates the following items:
-- 2 Tier-1
-- 1 Segment in each Tier-1 (2 in total)
-- 4 Groups
-- 3 Security Policies
-- 4 Rules in total
+This repository contains a number of examples showing latest vRA with NSX-T Automation examples. The goal of these examples is to get easily started with a topology and expand the capabilities based on your requirements. 
 
-## Requirements
-* NSX-T configured with:
-  - At least one Transport Zone
-  - At least one Edge Cluster (with one or more Edges)
-  - Tier-0 Gateway pre-provisioned
-* vRA installed and configured with NSX-T
+Each example contains a READMe.md file which explains the example, contains a diagram and describes the feature and requirements. 
 
+In general you need vRA to be configured with NSX-T as an Endpoint. In all examples  it is assumed a Network Profile is ready and tagged with a Capability Tag. 
 
-## Usage
+Each Cloud Template code can be copied to a vRA Cloud Assembly environment and adapted to your environment.
 
-Import/Copy-paste the blueprint into vRA to deploy
+Currently the following examples are available:
+
+- 3-Tier-Application
+- Shared Gateway with NAT
+- Shared Gateway with Outbound Networks
+- Shared Gateway with Routed Networks
 
