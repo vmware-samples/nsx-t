@@ -1,0 +1,12 @@
+*.pyc
+*.pyo
+.DS_Store
+
+java/lib
+java/target
+python/lib
+python/venv
+
+.classpath
+.project
+.settings

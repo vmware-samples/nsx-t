@@ -1,0 +1,49 @@
+formatVersion: 1
+inputs: {}
+resources:
+  Cloud_Machine_1:
+    type: Cloud.Machine
+    properties:
+      image: ubuntu
+      flavor: Small
+      networks:
+        - network: '${resource.Network_1.id}'
+  Cloud_Machine_2:
+    type: Cloud.Machine
+    properties:
+      image: ubuntu
+      flavor: Small
+      networks:
+        - network: '${resource.Network_1.id}'
+  Cloud_Machine_3:
+    type: Cloud.Machine
+    properties:
+      image: ubuntu
+      flavor: Small
+      networks:
+        - network: '${resource.Network_2.id}'
+  Cloud_Machine_4:
+    type: Cloud.Machine
+    properties:
+      image: ubuntu
+      flavor: Small
+      networks:
+        - network: '${resource.Network_2.id}'
+  Gateway_1:
+    type: Cloud.NSX.Gateway
+    properties:
+      networks:
+        - '${resource.Network_1.id}'
+        - '${resource.Network_2.id}'
+  Network_1:
+    type: Cloud.NSX.Network
+    properties:
+      networkType: routed
+      constraints:
+        - tag: 'net:shared-gateway'
+  Network_2:
+    type: Cloud.NSX.Network
+    properties:
+      networkType: routed
+      constraints:
+        - tag: 'net:shared-gateway'
