@@ -16,4 +16,5 @@ Currently the following examples are available:
 - Shared Gateway with NAT
 - Shared Gateway with Outbound Networks
 - Shared Gateway with Routed Networks
+- Micro-Segmentation with Outbound Network
 
