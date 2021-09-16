@@ -1,0 +1,192 @@
+# Copyright 2018 VMware, Inc.
+# SPDX-License-Identifier: BSD-2-Clause OR GPL-3.0-only
+---
+# Common NSX Appliance variables
+username: "admin"
+validate_certs: false
+admin_password: "password"
+cli_password: "password"
+state: present
+
+# OVA/OVF Information. Path can be on local file system or a HTTP URL
+ovftool_path: "/usr/bin"
+path_to_ova: "/nfs/nfs-01/ISO"
+ova_file: "nsx-unified-appliance-3.1.2.0.0.17883600.ova"
+
+# Common Networking Variables
+dns_server: "10.174.113.131"
+dns_domain: "raylab.local"
+ntp_server: "10.174.113.131"
+gateway: "10.174.113.253"
+netmask: "255.255.254.0"
+prefix: "23"
+
+# License
+license_key: "ABCDE-FGHIJ-KLMNO-PQRST-UVWXY"
+
+# vCenter variables
+compute_managers:
+- display_name: "vcsa-01"
+  vcenter: "vcsa-01.raylab.local"
+  origin_type: "vCenter"
+  credential_type: "UsernamePasswordLoginCredential"
+  vcenter_name: "AMS Management vCenter"
+  vcenter_user: "administrator@vsphere.local"
+  vcenter_passwd: "password"
+
+- display_name: "vcsa-02"
+  vcenter: "vcsa-02.raylab.local"
+  origin_type: "vCenter"
+  credential_type: "UsernamePasswordLoginCredential"
+  vcenter_name: "AMS Compute vCenter"
+  vcenter_user: "administrator@vsphere.local"
+  vcenter_passwd: "password"
+
+- display_name: "vcsa-03"
+  vcenter: "vcsa-03.raylab.local"
+  origin_type: "vCenter"
+  credential_type: "UsernamePasswordLoginCredential"
+  vcenter_name: "PAR Management vCenter"
+  vcenter_user: "administrator@vsphere.local"
+  vcenter_passwd: "password"
+
+- display_name: "vcsa-04"
+  vcenter: "vcsa-04.raylab.local"
+  origin_type: "vCenter"
+  credential_type: "UsernamePasswordLoginCredential"
+  vcenter_name: "PAR Compute vCenter"
+  vcenter_user: "administrator@vsphere.local"
+  vcenter_passwd: "password"
+
+# First Amsterdam Local NSX Manager
+# Thumbprint is required for Local Manager Registration on Global Manager (copy key after LM deployment)
+nsx_lm_1:
+  display_name: "AMS-LM-01"
+  id: "AMS_LM_01"
+  hostname: "ams-nsxt-lm01"
+  fqdn: "ams-nsxt-lm01.raylab.local"
+  ip_address: "10.174.113.139"
+  vmname: "ams-nsxt-lm01"
+  folder: ""
+  datacenter: "AMS"
+  datastore: "nfs-01"
+  portgroup: "Management-VLAN-1647"
+  cluster: "Management"
+  deployment_size: "small"
+  role: "NSX Manager"
+  thumbprint: "b1e992271788c6db2a7d3ce1ea71e37ba6313adbe0f76b6f7f6e1c7f1ac6aa45"
+
+# Additional Amsterdam Local NSX Managers
+local_managers:
+- display_name: "AMS_LM_02"
+  hostname: "ams-nsxt-lm02"
+  ip_address: "10.174.113.140"
+  folder: ""
+  datacenter: "AMS"
+  datastore: "nfs-01"
+  portgroup: "Management-VLAN-1647"
+  cluster: "Management"
+  deployment_size: "SMALL"
+  
+- display_name: "NSX_LM_03"
+  hostname: "ams-nsxt-lm03"
+  ip_address: "10.174.113.141"
+  folder: ""
+  datacenter: "AMS"
+  datastore: "nfs-01"
+  portgroup: "Management-VLAN-1647"
+  cluster: "Management"
+  deployment_size: "SMALL" 
+
+# Amsterdam Local Manager Cluster VIP
+lm_vip:
+  virtual_ip_address: "10.174.113.142"
+
+# First Amsterdam Global NSX Manager 
+nsx_gm_1:
+  id: "AMS-GM-01"
+  display_name: "Amsterdam Active"
+  hostname: "ams-nsxt-gm01"
+  ip_address: "10.174.113.143"
+  fqdn: "ams-nsxt-gm01.raylab.local" 
+  vmname: "AMS-NSXT-GM01"
+  folder: ""
+  datacenter: "AMS"
+  datastore: "nfs-01"
+  portgroup: "Management-VLAN-1647"
+  cluster: "Management"
+  deployment_size: "small"
+  role: "NSX Global Manager"
+  password: "password"
+  mode: "ACTIVE"
+
+# Additional Global Managers 
+global_managers:
+- display_name: "AMS-GM-02"
+  # id: "AMS-GM-02"
+  node_id: "AMS-GM-02"
+  hostname: "ams-nsxt-gm02"
+  fqdn: "ams-nsxt-gm02.raylab.local"
+  ip_address: "10.174.113.144"
+  folder: ""
+  datacenter: "AMS"
+  datastore: "nfs-01"
+  portgroup: "Management-VLAN-1647"
+  cluster: "Management"
+  deployment_size: "SMALL"
+  password: "password"
+
+- display_name: "AMS-GM-03"
+  # id: "AMS-GM-03"
+  hostname: "ams-nsxt-gm03"
+  fqdn: "ams-nsxt-gm03.raylab.local"
+  ip_address: "10.174.113.145"
+  folder: ""
+  datacenter: "AMS"
+  datastore: "nfs-01"
+  portgroup: "Management-VLAN-1647"
+  cluster: "Management"
+  deployment_size: "SMALL"
+  password: "password"
+
+# Amsterdam Global Manager Cluster VIP
+gm_vip:
+  virtual_ip_address: "10.174.113.146"
+
+# First Standby Global Manager
+# Thumbprint is required for Stanby Manager Registration on Global Manager (copy key after Stanby GM deployment)
+nsx_standby_gm_1:
+  id: "AMS-STBY-GM-01"
+  display_name: "Amsterdam Standby"
+  hostname: "ams-stby-nsxt-gm01"
+  ip_address: "10.174.113.147"
+  fqdn: "10.174.113.147" 
+  vmname: "ams-stby-nsxt-gm01"
+  folder: ""
+  datacenter: "AMS"
+  datastore: "nfs-01"
+  portgroup: "Management-VLAN-1647"
+  cluster: "Management"
+  deployment_size: "small"
+  role: "NSX Global Manager"
+  password: "password"
+  mode: "STANDBY"
+  thumbprint: "07ade6409e9527b87c41f4ccfb03be7b0606ea05b737ea2a8f4755b413dfbb28"
+
+# Additional Standby Global Managers
+standby_managers:
+- hostname: "ams-stby-nsxt-gm02"
+  ip_address: "10.174.113.148"
+  datastore: "nfs-01"
+  portgroup: "Management-VLAN-1647"
+  cluster: "Management"
+  deployment_size: "SMALL"
+  password: "password"
+
+- hostname: "ams-stby-nsxt-gm03"
+  ip_address: "10.174.113.149"
+  datastore: "nfs-01"
+  portgroup: "Management-VLAN-1647"
+  cluster: "Management"
+  deployment_size: "SMALL"
+  password: "password"
