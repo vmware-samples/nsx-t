@@ -1,0 +1,49 @@
+# Copyright 2018 VMware, Inc.
+# SPDX-License-Identifier: BSD-2-Clause OR GPL-3.0-only
+---
+#
+# Deploys remaining NSX appliance nodes and forms a cluster. Requires the first
+# NSX appliance node to be deployed and at least one Compute Manager registered.
+#
+- hosts: 127.0.0.1
+  connection: local
+  become: true
+  vars_files:
+    - answerfile.yml
+  tasks:
+    - name: Deploying Second and Third Global Managers
+      vmware.ansible_for_nsxt.nsxt_manager_auto_deployment:
+        hostname: "{{ nsx_gm_1.hostname }}"
+        username: "{{ username }}"
+        password: "{{ nsx_gm_1.password }}"
+        validate_certs: "{{ validate_certs }}"
+        deployment_requests:
+          - roles:
+              - MANAGER
+              - CONTROLLER
+            form_factor: "{{ item.deployment_size }}"
+            user_settings:
+              cli_password: "{{ admin_password }}"
+              root_password: "{{ cli_password }}"
+            deployment_config:
+              placement_type: VsphereClusterNodeVMDeploymentConfig
+              vc_name: "{{ compute_managers[0]['vcenter_name'] }}"
+              vc_username: "{{ compute_managers[0]['vcenter_user'] }}"
+              vc_password: "{{ compute_managers[0]['vcenter_passwd'] }}"
+              management_network: "{{ item.portgroup }}"
+              hostname: "{{ item.hostname }}"
+              compute: "{{ item.cluster }}"
+              storage: "{{ item.datastore }}"
+              default_gateway_addresses:
+                - "{{ gateway }}"
+              dns_servers:
+                - "{{ dns_server }}"
+              ntp_servers:
+                - "{{ ntp_server }}"
+              management_port_subnets:
+                - ip_addresses:
+                    - "{{ item.ip_address }}"
+                  prefix_length: "{{ prefix }}"
+        state: "{{ state }}"
+      with_items:
+        - "{{ global_managers }}"

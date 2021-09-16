@@ -1,0 +1,24 @@
+---
+#
+# Playbook to register Local Manager with Global Manager
+#
+- hosts: 127.0.0.1
+  connection: local
+  become: true
+  vars_files:
+    - answerfile.yml
+  tasks:
+    - name: Register Local Manager with Global Manager
+      vmware.ansible_for_nsxt.nsxt_local_manager_registration:
+        hostname: "{{ nsx_gm_1.hostname }}"
+        username: "{{ username }}"
+        password: "{{ nsx_gm_1.password }}"
+        validate_certs: "{{ validate_certs }}"
+        display_name: "{{ nsx_lm_1.display_name }}"
+        id: "{{ nsx_lm_1.id }}"
+        site_connection_info:
+          fqdn: "{{ nsx_lm_1.fqdn }}"
+          username: "{{ username }}"
+          password: "{{ admin_password }}"
+          thumbprint: "{{ nsx_lm_1.thumbprint }}"
+        state: "{{ state }}"

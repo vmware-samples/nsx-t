@@ -1,0 +1,42 @@
+# Copyright 2018 VMware, Inc.
+# SPDX-License-Identifier: BSD-2-Clause OR GPL-3.0-only
+---
+- hosts: 127.0.0.1
+  connection: local
+  become: true
+  vars_files:
+    - answerfile.yml
+  tasks:
+    - name: Deploy first Global NSX Manager OVA
+      vmware.ansible_for_nsxt.nsxt_deploy_ova:
+        ovftool_path: "{{ ovftool_path }}"
+        folder: "{{ nsx_standby_gm_1.folder }}"
+        datacenter: "{{ nsx_standby_gm_1.datacenter }}"
+        datastore: "{{ nsx_standby_gm_1.datastore }}"
+        portgroup: "{{ nsx_standby_gm_1.portgroup }}"
+        cluster: "{{ nsx_standby_gm_1.cluster }}"
+        vmname: "{{ nsx_standby_gm_1.vmname }}"
+        hostname: "{{ nsx_standby_gm_1.hostname }}"
+        dns_server: "{{ dns_server }}"
+        dns_domain: "{{ dns_domain }}"
+        ntp_server: "{{ ntp_server }}"
+        gateway: "{{ gateway }}"
+        ip_address: "{{ nsx_standby_gm_1.ip_address }}"
+        netmask: "{{ netmask }}"
+        admin_password: "{{ admin_password }}"
+        cli_password: "{{ cli_password }}"
+        path_to_ova: "{{ path_to_ova }}"
+        ova_file: "{{ ova_file }}"
+        vcenter: "{{ compute_managers[0].vcenter }}"
+        vcenter_user: "{{ compute_managers[0].vcenter_user }}"
+        vcenter_passwd: "{{ compute_managers[0].vcenter_passwd }}"
+        deployment_size: "{{ nsx_standby_gm_1.deployment_size }}"
+        role: "{{ nsx_standby_gm_1.role }}"
+
+    - name: Check Global Manager status
+      vmware.ansible_for_nsxt.nsxt_manager_status:
+        hostname: "{{ nsx_standby_gm_1.hostname }}"
+        username: "{{ username }}"
+        password: "{{ nsx_standby_gm_1.password }}"
+        validate_certs: "{{ validate_certs }}"
+        wait_time: 30
