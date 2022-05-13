@@ -30,6 +30,13 @@ resources:
     properties:
       securityGroupType: new
       name: vra-app-vm
+      rules:
+        - access: Allow
+          source: '${SG_web.id}'
+          direction: inbound
+          name: allow-app-traffic
+          ports: '8443'
+          protocol: TCP
   SG_db:
     type: Cloud.SecurityGroup
     properties:
@@ -47,41 +54,55 @@ resources:
     properties:
       image: ubuntu
       flavor: small
-      customizationSpec: linux
       networks:
         - network: '${resource["tier-1_network"].id}'
           securityGroups:
             - '${resource.SG_web.id}'
             - '${resource.SG_all_vm.id}'
+          tags:
+            - key: Environment
+              value: Test
+            - key: Application
+              value: MyApp
       count: 1
+      tags:
+        - key: Environment
+          value: Test
+        - key: Application
+          value: MyApp
   App_VM:
     type: Cloud.Machine
     properties:
       image: ubuntu
       flavor: small
-      customizationSpec: linux
       networks:
         - network: '${resource["tier-1_network"].id}'
           securityGroups:
             - '${resource.SG_app.id}'
             - '${resource.SG_all_vm.id}'
       count: 1
+      tags:
+        - key: Environment
+          value: Test
+        - key: Application
+          value: MyApp
   DB_VM:
     type: Cloud.Machine
     properties:
       image: ubuntu
       flavor: small
-      customizationSpec: linux
       networks:
         - network: '${resource["tier-1_network"].id}'
           securityGroups:
             - '${resource.SG_db.id}'
             - '${resource.SG_all_vm.id}'
       count: 1
+      tags:
+        - key: Environment
+          value: Test
+        - key: Application
+          value: MyApp
   tier-1_network:
     type: Cloud.NSX.Network
     properties:
       networkType: outbound
-      constraints:
-        - tag: vmworld
-

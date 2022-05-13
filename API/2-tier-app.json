@@ -179,9 +179,9 @@
               "id" : "DenyAll",
               "display_name" : "Deny All",
               "source_groups" : [ "ANY" ],
-              "destination_groups" : [ "/infra/domains/default/groups/DB-VM-Group", "/infra/domains/default/groups/Web-VM-Group" ],
+              "destination_groups" : [ "ANY" ],
               "services" : [ "ANY" ],
-              "scope" : [ "ANY" ]
+              "scope" : [ "/infra/domains/default/groups/DB-VM-Group", "/infra/domains/default/groups/Web-VM-Group" ]
             },
             "resource_type" : "ChildRule",
             "id" : "DenyAll"

@@ -1,0 +1,19 @@
+---
+# short_description: 'Sets and clears cluster virtual IP address'
+# description: "Sets the cluster virtual IP address. Note, all nodes in the management
+# cluster must be in the same subnet. If not, a 409 CONFLICT status is
+# returned. "
+- hosts: 127.0.0.1
+  connection: local
+  become: true
+  vars_files:
+    - answerfile.yml
+  tasks:
+    - name: Adds Global Managers Cluster Virtual IP address
+      vmware.ansible_for_nsxt.nsxt_virtual_ip:
+        hostname: "{{ nsx_gm_1.hostname }}"
+        username: "{{ username }}"
+        password: "{{ nsx_gm_1.password }}"
+        validate_certs: "{{ validate_certs }}"
+        virtual_ip_address: "{{ gm_vip.virtual_ip_address }}"
+        state: "{{ state }}"
