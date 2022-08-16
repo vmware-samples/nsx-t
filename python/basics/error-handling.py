@@ -81,12 +81,8 @@ def main():
     try:
         result_tz = api_client.TransportZones.create(new_tz)
     except Error as ex:
-        print ex
         api_error = ex.data.convert_to(ApiError)
         print("An error occurred: %s" % api_error.error_message)
-        # You can also extract the HTTP response code
-        print("HTTP response code %d" %
-              api_client._stub_config._response_extractor.get_http_status())
 
 
 if __name__ == "__main__":

@@ -43,7 +43,9 @@ import sys
 from util import auth
 from util import getargs
 from vmware.vapi.bindings.struct import PrettyPrinter
+from com.vmware.nsx.model_client import ApiError
 from com.vmware.nsx.model_client import TransportZone
+from com.vmware.vapi.std.errors_client import Error
 from com.vmware.vapi.std.errors_client import NotFound
 
 """
@@ -92,10 +94,14 @@ def main():
     new_tz = TransportZone(
         transport_type=TransportZone.TRANSPORT_TYPE_OVERLAY,
         display_name="My transport zone",
-        description="Transport zone for basic create/read/update/delete demo",
-        host_switch_name="hostswitch1"
+        description="Transport zone for basic create/read/update/delete demo"
     )
-    result_tz = api_client.TransportZones.create(new_tz)
+    try:
+        result_tz = api_client.TransportZones.create(new_tz)
+    except Error as ex:
+        api_error = ex.data.convert_to(ApiError)
+        print("An error occurred: %s" % api_error.error_message)
+        sys.exit(1)
     print("Transport zone created. id is %s" % result_tz.id)
 
     # Save the id, which uniquely identifies the resource we created.

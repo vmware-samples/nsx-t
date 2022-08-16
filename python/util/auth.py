@@ -108,7 +108,7 @@ def get_session_auth_stub_config(user, password, nsx_host, tcp_port=443):
     connector = connect.get_requests_connector(
         session=session, msg_protocol='rest', url=nsx_url)
     stub_config = StubConfigurationFactory.new_runtime_configuration(
-        connector, response_extractor=True)
+        connector)
     return stub_config
 
 
