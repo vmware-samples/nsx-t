@@ -3,8 +3,8 @@
 #     Tier1, 2 Segments, Groups and DFW rules
 #
 
-Set-PowerCLIConfiguration -Scope User -ParticipateInCEIP $true -Confirm:$false
-Set-PowerCLIConfiguration -InvalidCertificateAction Ignore -Confirm:$false
+Set-PowerCLIConfiguration -Scope User -ParticipateInCEIP $true -Confirm:$false | Out-Null
+Set-PowerCLIConfiguration -Scope User -InvalidCertificateAction:Ignore -Confirm:$false | Out-Null
 
 $nsx_ip = "nsxapp-01a.corp.local"
 $nsx_user = "admin"

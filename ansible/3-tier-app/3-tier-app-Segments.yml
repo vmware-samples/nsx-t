@@ -44,7 +44,7 @@
         validate_certs: "{{ validate_certs }}"
         state: "{{ state }}"
         display_name: "ANS-3Tier"
-        transport_zone_display_name: "Overlay-TZ"
+        transport_zone_display_name: "nsx-overlay-transportzone"
         tier1_id: "ANS-VMW-T1"
         advanced_config:
           connectivity: "ON"
@@ -59,7 +59,7 @@
         validate_certs: "{{ validate_certs }}"
         state: "{{ state }}"
         display_name: "ANS-Client"
-        transport_zone_display_name: "Overlay-TZ"
+        transport_zone_display_name: "nsx-overlay-transportzone"
         tier1_id: "ANS-Client-T1"
         advanced_config:
           connectivity: "ON"

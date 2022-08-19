@@ -29,6 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 Set-PowerCLIConfiguration -Scope User -ParticipateInCEIP $true -Confirm:$false | Out-Null
+Set-PowerCLIConfiguration -Scope User -InvalidCertificateAction:Ignore -Confirm:$false | Out-Null
 
 $NSX_IP = "10.176.203.3"
 $NSX_User = "admin"
@@ -148,7 +149,7 @@ function createDFWSecurityPolicy($PolicyName, $Category, $RuleName, $SourceGroup
     }
     
     $r = Initialize-Rule -DisplayName $RuleName -Id $RuleName -SourceGroups $SourceGroupList -DestinationGroups $DestinationGroupList -Services $ServicePathList -Action $Action
-    $sp = Initialize-SecurityPolicy -DisplayName $PolicyName -Id $PolicyName -Rules @($r)
+    $sp = Initialize-SecurityPolicy -DisplayName $PolicyName -Id $PolicyName -Rules @($r) -Category $Category
     $createdSP = Invoke-PatchSecurityPolicyForDomain -Server $n -DomainId default -SecurityPolicyId $PolicyName -SecurityPolicy $sp
     Write-Host "Created DFW Policy $PolicyName with Rule $RuleName ..."
 }
