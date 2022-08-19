@@ -45,7 +45,7 @@ data "nsxt_policy_edge_cluster" "demo" {
 }
 
 data "nsxt_policy_transport_zone" "overlay_tz" {
-  display_name = "Overlay-TZ"
+  display_name = "nsx-overlay-transportzone"
 }
 
 resource "nsxt_policy_tier0_gateway" "TF-3Tier-T0" {
