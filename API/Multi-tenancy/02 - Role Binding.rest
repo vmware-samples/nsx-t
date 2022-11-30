@@ -1,0 +1,59 @@
+# This API Call can be used with Visual Studio Code and REST Client extension
+# adeleporte@vmware.com
+
+@nsx = 10.191.173.2
+@password = Admin!23Admin
+@project_name = Project1
+
+
+
+PUT https://{{ nsx }}/api/v1/aaa/role-bindings/05830c3b-0669-4ec5-84be-8942f75bf27d
+content-type: application/json
+Authorization: Basic admin {{ password }}
+
+{
+  "name": "guestuser1",
+  "type": "local_user",
+  "roles_for_paths": [
+    {
+        "path": "/",
+        "roles": [
+        {
+            "role": "auditor",
+            "role_display_name": "Auditor"
+        }
+        ]
+    },
+    {
+      "path": "/orgs/default/projects/{{ project_name }}",
+      "roles": [
+        {
+          "role": "project_admin",
+          "role_display_name": "Project Admin"
+        }
+      ]
+    }
+  ],
+  "read_roles_for_paths": true,
+  "resource_type": "RoleBinding",
+  "_revision": 0
+}
+
+###
+
+DELETE https://{{ nsx }}/api/v1/aaa/role-bindings/05830c3b-0669-4ec5-84be-8942f75bf27d?path=/
+content-type: application/json
+Authorization: Basic admin {{ password }}
+
+###
+
+
+GET https://{{ nsx }}/api/v1/aaa/roles
+content-type: application/json
+Authorization: Basic admin {{ password }}
+
+###
+
+GET https://{{ nsx }}/api/v1/aaa/role-bindings
+content-type: application/json
+Authorization: Basic admin {{ password }}

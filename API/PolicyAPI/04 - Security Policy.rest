@@ -1,0 +1,64 @@
+# This API Call can be used with Visual Studio Code and REST Client extension
+# adeleporte@vmware.com
+
+@nsx = 10.221.109.5
+@username = admin
+@password = VMware1!VMware1!
+
+### Create/Update a security policy
+
+PATCH https://{{nsx}}/policy/api/v1/infra/domains/default/security-policies/MyRule
+content-type: application/json
+Authorization: Basic {{username}} {{password}}
+
+{
+    "rules": [
+        {
+            "action": "ALLOW",
+            "resource_type": "Rule",
+            "id": "MyRule",
+            "display_name": "MyRule",
+            "description": "MyRule",
+            "source_groups": [
+                "ANY"
+            ],
+            "destination_groups": [
+                "ANY"
+            ],
+            "services": [
+                "/infra/services/HTTP"
+            ],
+            "profiles": [
+                "ANY"
+            ],
+            "logged": false,
+            "scope": [
+                "ANY"
+            ],
+            "disabled": false,
+            "direction": "IN_OUT"
+        }
+    ],
+    "logging_enabled": false,
+    "resource_type": "SecurityPolicy",
+    "id": "MyPolicy",
+    "display_name": "MySection",
+    "description": "MySection",
+    "category": "Application",
+    "stateful": true,
+    "scope": [
+        "ANY"
+    ]
+}
+
+
+### Get the security policy
+
+GET https://{{nsx}}/policy/api/v1/infra/domains/default/security-policies/MyRule
+Authorization: Basic {{username}} {{password}}
+
+
+### Delete the security policy
+
+DELETE https://{{nsx}}/policy/api/v1/infra/domains/default/security-policies/MyRule
+Authorization: Basic {{username}} {{password}}

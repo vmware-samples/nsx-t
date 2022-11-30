@@ -1,0 +1,70 @@
+# This API Call can be used with Visual Studio Code and REST Client extension
+# adeleporte@vmware.com
+
+@nsx = 10.221.109.5
+@username = admin
+@password = VMware1!VMware1!
+
+@delete = false
+
+
+### Use filter to Get the complete object tree with a single API (This query can be long)
+
+GET https://{{nsx}}/policy/api/v1/infra?filter=Type-
+content-type: application/json
+Authorization: Basic {{username}} {{password}}
+
+### Use filter to Filter Infra for all “Tier-1” gateway objects
+
+GET https://{{nsx}}/policy/api/v1/infra?filter=Type-Tier1
+content-type: application/json
+Authorization: Basic {{username}} {{password}}
+
+### Use filter to Filter Infra for all segments” objects
+
+GET https://{{nsx}}/policy/api/v1/infra?filter=Type-Segment
+content-type: application/json
+Authorization: Basic {{username}} {{password}}
+
+### Use filter to Filter Infra for all “group” objects
+
+GET https://{{nsx}}/policy/api/v1/infra?filter=Type-Domain|Group
+content-type: application/json
+Authorization: Basic {{username}} {{password}}
+
+### Use filter to Filter Infra for all “security policy rule” objects
+
+GET https://{{nsx}}/policy/api/v1/infra?filter=Type-Domain|SecurityPolicy|Rule
+content-type: application/json
+Authorization: Basic {{username}} {{password}}
+
+### Get the complete object with child objects
+
+GET https://{{nsx}}/policy/api/v1/infra?base_path=/infra/domains/default
+content-type: application/json
+Authorization: Basic {{username}} {{password}}
+
+### Retrieve LocaleServices/BGP/Route redistribution etc with Tier0
+
+GET https://{{nsx}}/policy/api/v1/infra?base_path=/infra/tier-0s/MyT0
+content-type: application/json
+Authorization: Basic {{username}} {{password}}
+
+
+### Get all Tier0s and their children
+
+GET https://{{nsx}}/policy/api/v1/infra?type_filter=Tier0
+content-type: application/json
+Authorization: Basic {{username}} {{password}}
+
+### Retrieve multiple Resources (with child objects)
+
+GET https://{{nsx}}/policy/api/v1/infra?type_filter=Tier0;Group
+content-type: application/json
+Authorization: Basic {{username}} {{password}}
+
+### Retrieve ALL SecurityPolicies with Rules
+
+GET https://{{nsx}}/policy/api/v1/infra?type_filter=SecurityPolicy&base_path=/infra/domains/default
+content-type: application/json
+Authorization: Basic {{username}} {{password}}

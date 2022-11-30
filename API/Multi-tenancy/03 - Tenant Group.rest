@@ -1,0 +1,84 @@
+# This API Call can be used with Visual Studio Code and REST Client extension
+# adeleporte@vmware.com
+
+@nsx = 10.191.173.2
+@password = Admin!23Admin
+@project_name = Project1
+# @project_name = Dev_project
+@group_name = Project1Group
+
+@infra = infra/domains/default/groups
+
+PATCH https://{{ nsx }}/policy/api/v1/orgs/default/projects/{{ project_name }}/{{ infra }}/{{ group_name }}
+content-type: application/json
+Authorization: Basic admin {{ password }}
+
+{
+    "expression": [
+      {
+        "member_type": "VirtualMachine",
+        "value": "webvm",
+        "key": "Tag",
+        "operator": "EQUALS",
+        "resource_type": "Condition"
+      }
+    ],
+    "description": "{{ group_name }}",
+    "display_name": "{{ group_name }}"
+}
+
+###
+DELETE https://{{ nsx }}/policy/api/v1/orgs/default/projects/{{ project_name }}/{{ infra }}/{{ group_name }}
+content-type: application/json
+Authorization: Basic admin {{ password }}
+
+### Get infra groups using the Enterprise Admin
+GET https://{{ nsx }}/policy/api/v1/{{ infra }}
+content-type: application/json
+Authorization: Basic admin {{ password }}
+
+### Get Project groups using the Enterprise Admin
+GET https://{{ nsx }}/policy/api/v1/orgs/default/projects/{{ project_name }}/{{ infra }}
+content-type: application/json
+Authorization: Basic admin {{ password }}
+
+### Get Project groups using Project Admin
+GET https://{{ nsx }}/policy/api/v1/orgs/default/projects/{{ project_name }}/{{ infra }}
+content-type: application/json
+Authorization: Basic guestuser1 {{ password }}
+
+### Get Shared groups using Project Admin
+GET https://{{ nsx }}/policy/api/v1/{{ infra }}
+content-type: application/json
+Authorization: Basic guestuser1 {{ password }}
+
+### Get shares using the Enterprise Admin
+GET https://{{ nsx }}/policy/api/v1/infra/shares
+content-type: application/json
+Authorization: Basic admin {{ password }}
+
+### Get shared-with-me using the Enterprise Admin
+GET https://{{ nsx }}/policy/api/v1/orgs/default/shared-with-me
+content-type: application/json
+Authorization: Basic admin {{ password }}
+
+### Get shared-with-me using the Project Admin
+GET https://{{ nsx }}/policy/api/v1/orgs/default/projects/{{ project_name }}/shared-with-me
+content-type: application/json
+Authorization: Basic guestuser1 {{ password }}
+
+### Get services using the Enterprise Admin
+GET https://{{ nsx }}/policy/api/v1/infra/services
+content-type: application/json
+Authorization: Basic admin {{ password }}
+
+### Get services using the Project Admin
+GET https://{{ nsx }}/policy/api/v1/infra/services
+content-type: application/json
+Authorization: Basic guestuser1 {{ password }}
+
+### Get project services using the Project Admin
+GET https://{{ nsx }}/policy/api/v1/orgs/default/projects/{{ project_name }}/infra/services
+content-type: application/json
+Authorization: Basic guestuser1 {{ password }}
+

@@ -1,0 +1,141 @@
+# This API Call can be used with Visual Studio Code and REST Client extension
+# adeleporte@vmware.com
+
+@nsx = 10.191.173.2
+@password = Admin!23Admin
+@project_name = Project1
+# @project_name = Dev_project
+@group_name = Project1Group
+@section_name = Project1Section
+
+@infra = infra/domains/default/security-policies
+
+# Create policy using Enterprise admin
+PATCH https://{{ nsx }}/policy/api/v1/orgs/default/projects/{{ project_name }}/{{ infra }}/{{ section_name }}
+content-type: application/json
+Authorization: Basic admin {{ password }}
+
+{
+    "description": "comm map patched",
+    "display_name": "{{ section_name }}",
+    "category": "Application",
+    "rules": [
+      {
+        "description": " comm entry",
+        "display_name": "Rule1",
+        "source_groups": [
+          "/orgs/default/projects/{{project_name}}/infra/domains/default/groups/{{group_name}}"
+        ],
+        "destination_groups": [
+          "/orgs/default/projects/{{project_name}}/infra/domains/default/groups/{{group_name}}"
+        ],
+        "services": [
+          "/infra/services/HTTP",
+          "/infra/services/CIM-HTTP"
+        ],
+        "action": "ALLOW"
+      },
+      {
+        "description": " comm entry",
+        "display_name": "Rule2",
+        "source_groups": [
+          "/orgs/default/projects/{{project_name}}/infra/domains/default/groups/{{group_name}}"
+        ],
+        "destination_groups": [
+          "/orgs/default/projects/{{project_name}}/infra/domains/default/groups/{{group_name}}"
+        ],
+        "services": [
+          "/infra/services/HTTP",
+          "/infra/services/CIM-HTTP"
+        ],
+        "action": "ALLOW"
+      },
+      {
+        "description": " comm entry",
+        "display_name": "Rule3",
+        "source_groups": [
+          "/orgs/default/projects/{{project_name}}/infra/domains/default/groups/{{group_name}}"
+        ],
+        "destination_groups": [
+          "/orgs/default/projects/{{project_name}}/infra/domains/default/groups/{{group_name}}"
+        ],
+        "services": [
+          "/infra/services/HTTP",
+          "/infra/services/CIM-HTTP"
+        ],
+        "action": "ALLOW"
+      }
+
+    ]
+}
+
+###
+
+# Create policy using Project admin
+PATCH https://{{ nsx }}/policy/api/v1/orgs/default/projects/{{ project_name }}/{{ infra }}/{{ section_name }}
+content-type: application/json
+Authorization: Basic guestuser1 {{ password }}
+
+{
+    "description": "comm map patched",
+    "display_name": "{{ section_name }}",
+    "category": "Application",
+    "rules": [
+      {
+        "description": " comm entry",
+        "display_name": "Rule1",
+        "source_groups": [
+          "/orgs/default/projects/{{project_name}}/infra/domains/default/groups/{{group_name}}"
+        ],
+        "destination_groups": [
+          "/orgs/default/projects/{{project_name}}/infra/domains/default/groups/{{group_name}}"
+        ],
+        "services": [
+          "/infra/services/HTTP",
+          "/infra/services/CIM-HTTP"
+        ],
+        "action": "ALLOW"
+      },
+      {
+        "description": " comm entry",
+        "display_name": "Rule2",
+        "source_groups": [
+          "/orgs/default/projects/{{project_name}}/infra/domains/default/groups/{{group_name}}"
+        ],
+        "destination_groups": [
+          "/orgs/default/projects/{{project_name}}/infra/domains/default/groups/{{group_name}}"
+        ],
+        "services": [
+          "/infra/services/HTTP",
+          "/infra/services/CIM-HTTP"
+        ],
+        "action": "ALLOW"
+      },
+      {
+        "description": " comm entry",
+        "display_name": "Rule3",
+        "source_groups": [
+          "/orgs/default/projects/{{project_name}}/infra/domains/default/groups/{{group_name}}"
+        ],
+        "destination_groups": [
+          "/orgs/default/projects/{{project_name}}/infra/domains/default/groups/{{group_name}}"
+        ],
+        "services": [
+          "/infra/services/HTTP",
+          "/infra/services/CIM-HTTP"
+        ],
+        "action": "ALLOW"
+      }
+
+    ]
+}
+
+###
+DELETE https://{{ nsx }}/policy/api/v1/orgs/default/projects/{{ project_name }}/{{ infra }}/{{ section_name }}
+content-type: application/json
+Authorization: Basic admin {{ password }}
+
+### Get policies using the Enterprise Admin
+GET https://{{ nsx }}/policy/api/v1/orgs/default/projects/{{ project_name }}/{{ infra }}/{{ section_name }}
+content-type: application/json
+Authorization: Basic admin {{ password }}

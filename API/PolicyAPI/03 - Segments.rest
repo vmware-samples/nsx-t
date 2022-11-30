@@ -1,0 +1,35 @@
+# This API Call can be used with Visual Studio Code and REST Client extension
+# adeleporte@vmware.com
+
+@nsx = 10.221.109.5
+@username = admin
+@password = VMware1!VMware1!
+
+### Create/Update a segment
+
+PATCH https://{{nsx}}/policy/api/v1/infra/segments/MySegment
+content-type: application/json
+Authorization: Basic {{username}} {{password}}
+
+{
+    "resource_type": "Segment",
+    "id": "MySegment",
+    "connectivity_path": "/infra/tier-1s/MyT1",
+    "subnets": [
+            {
+                "gateway_address": "192.168.1.1/24"
+            }
+        ]
+
+}
+
+### Get the segment
+
+GET https://{{nsx}}/policy/api/v1/infra/segments/MySegment
+Authorization: Basic {{username}} {{password}}
+
+
+### Delete the segment
+
+DELETE https://{{nsx}}/policy/api/v1/infra/segments/MySegment
+Authorization: Basic {{username}} {{password}}
