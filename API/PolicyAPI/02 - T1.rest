@@ -1,0 +1,33 @@
+# This API Call can be used with Visual Studio Code and REST Client extension
+# adeleporte@vmware.com
+
+@nsx = 10.221.109.5
+@username = admin
+@password = VMware1!VMware1!
+
+### Create/Update a T1 router
+
+PATCH https://{{nsx}}/policy/api/v1/infra/tier-1s/MyT1
+content-type: application/json
+Authorization: Basic {{username}} {{password}}
+
+{
+    "resource_type": "Tier1",
+    "id": "MyT1",
+    "tier0_path":"/infra/tier-0s/MyT0",
+        "route_advertisement_types": [
+          "TIER1_CONNECTED"
+        ]
+
+}
+
+### Get the T1 router
+
+GET https://{{nsx}}/policy/api/v1/infra/tier-1s/MyT1
+Authorization: Basic {{username}} {{password}}
+
+
+### Delete the T1 router
+
+DELETE https://{{nsx}}/policy/api/v1/infra/tier-1s/MyT1
+Authorization: Basic {{username}} {{password}}

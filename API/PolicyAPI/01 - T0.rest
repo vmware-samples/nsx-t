@@ -1,0 +1,28 @@
+# This API Call can be used with Visual Studio Code and REST Client extension
+# adeleporte@vmware.com
+
+@nsx = 10.221.109.5
+@username = admin
+@password = VMware1!VMware1!
+
+### Create/Update a T0 router
+
+PATCH https://{{nsx}}/policy/api/v1/infra/tier-0s/MyT0
+content-type: application/json
+Authorization: Basic {{username}} {{password}}
+
+{
+    "resource_type": "Tier0",
+    "id": "MyT0"
+}
+
+### Get the T0 router
+
+GET https://{{nsx}}/policy/api/v1/infra/tier-0s/MyT0
+Authorization: Basic {{username}} {{password}}
+
+
+### Delete the T0 router
+
+DELETE https://{{nsx}}/policy/api/v1/infra/tier-0s/MyT0
+Authorization: Basic {{username}} {{password}}

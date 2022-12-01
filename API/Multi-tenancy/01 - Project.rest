@@ -1,0 +1,31 @@
+# This API Call can be used with Visual Studio Code and REST Client extension
+# adeleporte@vmware.com
+
+@nsx = 10.191.173.2
+@password = Admin!23Admin
+@project_name = Project1
+
+### Create a project
+
+PATCH https://{{ nsx }}/policy/api/v1/orgs/default/projects/{{ project_name }}
+content-type: application/json
+Authorization: Basic admin {{ password }}
+
+{
+    "site_infos": [
+        {
+            "edge_cluster_paths": [
+                "/infra/sites/default/enforcement-points/default/edge-clusters/b4037a82-7960-4efd-b0b7-df32fc3cb2a2"
+            ],
+            "site_path": "/infra/sites/default"
+        }
+    ],
+    "tier_0s": [
+        "/infra/tier-0s/Tier0GatewayPepsi"
+    ]
+}
+
+### Delete a project
+DELETE https://{{ nsx }}/policy/api/v1/orgs/default/projects/{{ project_name }}
+content-type: application/json
+Authorization: Basic admin {{ password }}

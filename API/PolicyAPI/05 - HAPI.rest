@@ -1,0 +1,404 @@
+# This API Call can be used with Visual Studio Code and REST Client extension
+# adeleporte@vmware.com
+
+@nsx = 10.221.109.5
+@username = admin
+@password = VMware1!VMware1!
+
+@delete = false
+
+PATCH https://{{nsx}}/policy/api/v1/infra
+content-type: application/json
+Authorization: Basic {{username}} {{password}}
+
+{
+  "resource_type": "Infra",
+  "id": "infra",
+  "display_name": "infra",
+  "children": [
+    {
+      "resource_type": "ChildTier0",
+      "marked_for_delete":{{ delete }},
+      "Tier0": {
+        "ha_mode": "ACTIVE_ACTIVE",
+        "resource_type": "Tier0",
+        "id": "3Tier-T0",
+        "display_name": "3Tier-T0",
+        "children": [
+          {
+            "LocaleServices": {
+              "route_redistribution_config": {
+                "bgp_enabled": true,
+                "redistribution_rules": [
+                  {
+                    "name": "Multi-T1",
+                    "route_redistribution_types": [
+                      "TIER1_LB_SNAT",
+                      "TIER1_LB_VIP",
+                      "TIER1_DNS_FORWARDER_IP",
+                      "TIER1_NAT",
+                      "TIER1_CONNECTED",
+                      "TIER1_IPSEC_LOCAL_ENDPOINT",
+                      "TIER1_STATIC"
+                    ]
+                  }
+                ]
+              },
+              "edge_cluster_path": "/infra/sites/default/enforcement-points/default/edge-clusters/7e5f602b-7af9-480b-808b-27082519e832",
+              "resource_type": "LocaleServices",
+              "id": "default",
+              "display_name": "default"
+            },
+            "resource_type": "ChildLocaleServices"
+          }
+        ]
+      }
+    },
+    {
+      "Tier1": {
+        "tier0_path": "/infra/tier-0s/3Tier-T0",
+        "failover_mode": "NON_PREEMPTIVE",
+        "enable_standby_relocation": false,
+        "route_advertisement_types": [
+          "TIER1_NAT",
+          "TIER1_LB_VIP",
+          "TIER1_LB_SNAT",
+          "TIER1_DNS_FORWARDER_IP",
+          "TIER1_CONNECTED",
+          "TIER1_STATIC_ROUTES",
+          "TIER1_IPSEC_LOCAL_ENDPOINT"
+        ],
+        "force_whitelisting": false,
+        "default_rule_logging": false,
+        "disable_firewall": false,
+        "pool_allocation": "ROUTING",
+        "resource_type": "Tier1",
+        "id": "VMW-T1",
+        "display_name": "VMW-T1",
+        "marked_for_delete":{{ delete }},
+        "overridden": false
+      },
+      "resource_type": "ChildTier1",
+      "marked_for_delete":{{ delete }},
+      "mark_for_override": false,
+      "_protection": "NOT_PROTECTED"
+    },
+    {
+      "Tier1": {
+        "tier0_path": "/infra/tier-0s/3Tier-T0",
+        "failover_mode": "NON_PREEMPTIVE",
+        "route_advertisement_types": [
+          "TIER1_LB_VIP",
+          "TIER1_LB_SNAT",
+          "TIER1_DNS_FORWARDER_IP",
+          "TIER1_CONNECTED",
+          "TIER1_STATIC_ROUTES",
+          "TIER1_IPSEC_LOCAL_ENDPOINT"
+        ],
+        "force_whitelisting": false,
+        "default_rule_logging": false,
+        "disable_firewall": false,
+        "pool_allocation": "ROUTING",
+        "resource_type": "Tier1",
+        "id": "Client-T1",
+        "display_name": "Client-T1"
+      },
+      "resource_type": "ChildTier1",
+      "marked_for_delete":{{ delete }}
+    },
+    {
+      "Segment": {
+        "type": "ROUTED",
+        "subnets": [
+          {
+            "gateway_address": "192.168.1.1/24",
+            "network": "192.168.1.0/24"
+          }
+        ],
+        "connectivity_path": "/infra/tier-1s/VMW-T1",
+        "transport_zone_path": "/infra/sites/default/enforcement-points/default/transport-zones/1b3a2f36-bfd1-443e-a0f6-4de01abc963e",
+        "advanced_config": {
+          "connectivity": "ON"
+        },
+        "admin_state": "UP",
+        "replication_mode": "MTEP",
+        "resource_type": "Segment",
+        "id": "3Tier",
+        "display_name": "3Tier",
+        "marked_for_delete":{{ delete }}
+      },
+      "resource_type": "ChildSegment",
+      "marked_for_delete":{{ delete }},
+      "mark_for_override": false
+    },
+    {
+      "Segment": {
+        "type": "ROUTED",
+        "subnets": [
+          {
+            "gateway_address": "192.168.5.1/24",
+            "network": "192.168.5.0/24"
+          }
+        ],
+        "connectivity_path": "/infra/tier-1s/Client-T1",
+        "transport_zone_path": "/infra/sites/default/enforcement-points/default/transport-zones/1b3a2f36-bfd1-443e-a0f6-4de01abc963e",
+        "advanced_config": {
+          "connectivity": "ON"
+        },
+        "admin_state": "UP",
+        "replication_mode": "MTEP",
+        "resource_type": "Segment",
+        "id": "Client",
+        "display_name": "Client"
+      },
+      "resource_type": "ChildSegment",
+      "marked_for_delete":{{ delete }},
+      "mark_for_override": false
+    },
+    {
+      "Domain": {
+        "resource_type": "Domain",
+        "id": "default",
+        "display_name": "default",
+
+        "children": [
+
+          {
+            "SecurityPolicy": {
+              "resource_type": "SecurityPolicy",
+              "id": "Allow-SQL",
+              "display_name": "Allow-SQL",
+              "category": "Application",
+              "children": [
+                {
+                  "Rule": {
+                    "action": "ALLOW",
+                    "resource_type": "Rule",
+                    "id": "allow-mysql",
+                    "display_name": "allow-mysql",
+                    "source_groups": [
+                      "ANY"
+                    ],
+                    "destination_groups": [
+                      "/infra/domains/default/groups/db-vms"
+                    ],
+                    "services": [
+                      "/infra/services/MySQL"
+                    ],
+                    "service_entries": [],
+                    "profiles": [
+                      "ANY"
+                    ],
+                    "logged": false,
+                    "scope": [
+                      "ANY"
+                    ]
+                  },
+                  "resource_type": "ChildRule",
+                  "marked_for_delete":{{ delete }},
+                  "mark_for_override": false
+                }
+              ]
+            },
+            "resource_type": "ChildSecurityPolicy",
+            "marked_for_delete":{{ delete }},
+            "mark_for_override": false
+          },
+
+          {
+            "SecurityPolicy": {
+              "resource_type": "SecurityPolicy",
+              "id": "Allow-HTTP",
+              "display_name": "Allow-browsing",
+              "category": "Application",
+              "children": [
+                {
+                  "Rule": {
+                    "action": "ALLOW",
+                    "resource_type": "Rule",
+                    "id": "allow-80-443",
+                    "display_name": "allow-80-443",
+                    "source_groups": [
+                      "ANY"
+                    ],
+                    "destination_groups": [
+                      "/infra/domains/default/groups/web-vms"
+                    ],
+                    "services": [
+                      "/infra/services/HTTPS",
+                      "/infra/services/HTTP"
+                    ],
+                    "service_entries": [],
+                    "profiles": [
+                      "ANY"
+                    ],
+                    "logged": false,
+                    "scope": [
+                      "ANY"
+                    ]
+                  },
+                  "resource_type": "ChildRule",
+                  "marked_for_delete":{{ delete }},
+                  "mark_for_override": false
+                }
+              ]
+            },
+            "resource_type": "ChildSecurityPolicy",
+            "marked_for_delete":{{ delete }},
+            "mark_for_override": false
+          },
+
+          {
+            "SecurityPolicy": {
+              "resource_type": "SecurityPolicy",
+              "id": "Ops",
+              "display_name": "Ops",
+              "category": "Infrastructure",
+              "children": [
+                {
+                  "Rule": {
+                    "action": "REJECT",
+                    "resource_type": "Rule",
+                    "id": "Allow-SSH",
+                    "display_name": "Allow-SSH",
+                    "source_groups": [
+                      "ANY"
+                    ],
+                    "destination_groups": [
+                      "/infra/domains/default/groups/All-VMs"
+                    ],
+                    "services": [
+                      "/infra/services/SSH"
+                    ],
+                    "service_entries": [],
+                    "profiles": [
+                      "ANY"
+                    ],
+                    "logged": false,
+                    "scope": [
+                      "ANY"
+                    ]
+                  },
+                  "resource_type": "ChildRule",
+                  "marked_for_delete":{{ delete }},
+                  "mark_for_override": false
+                },
+                {
+                  "Rule": {
+                    "action": "ALLOW",
+                    "resource_type": "Rule",
+                    "id": "Allow-ICMP",
+                    "display_name": "Allow-ICMP",
+                    "source_groups": [
+                      "ANY"
+                    ],
+                    "destination_groups": [
+                      "/infra/domains/default/groups/All-VMs"
+                    ],
+                    "services": [
+                      "/infra/services/ICMP-ALL"
+                    ],
+                    "service_entries": [],
+                    "profiles": [
+                      "ANY"
+                    ],
+                    "logged": false,
+                    "scope": [
+                      "ANY"
+                    ]
+                  },
+                  "resource_type": "ChildRule",
+                  "marked_for_delete":{{ delete }},
+                  "mark_for_override": false
+                }
+              ]
+            },
+            "resource_type": "ChildSecurityPolicy",
+            "marked_for_delete":{{ delete }},
+            "mark_for_override": false
+          },
+          {
+            "Group": {
+              "expression": [
+                {
+                  "member_type": "VirtualMachine",
+                  "key": "Tag",
+                  "operator": "EQUALS",
+                  "value": "nsx",
+                  "resource_type": "Condition"
+                }
+              ],
+              "resource_type": "Group",
+              "id": "All-VMs",
+              "display_name": "all-vms"
+            },
+            "resource_type": "ChildGroup",
+            "marked_for_delete":{{ delete }},
+            "mark_for_override": false
+          },
+
+          {
+            "Group": {
+              "expression": [
+                {
+                  "member_type": "VirtualMachine",
+                  "key": "Tag",
+                  "operator": "EQUALS",
+                  "value": "db",
+                  "resource_type": "Condition"
+                }
+              ],
+              "resource_type": "Group",
+              "id": "db-vms",
+              "display_name": "db-vms"
+            },
+            "resource_type": "ChildGroup",
+            "marked_for_delete":{{ delete }},
+            "mark_for_override": false
+          },
+
+          {
+            "Group": {
+              "expression": [
+                {
+                  "member_type": "VirtualMachine",
+                  "key": "Tag",
+                  "operator": "EQUALS",
+                  "value": "web",
+                  "resource_type": "Condition"
+                }
+              ],
+              "resource_type": "Group",
+              "id": "web-vms",
+              "display_name": "web-vms"
+            },
+            "resource_type": "ChildGroup",
+            "marked_for_delete":{{ delete }},
+            "mark_for_override": false
+          },
+
+          {
+            "Group": {
+              "expression": [
+                {
+                  "member_type": "VirtualMachine",
+                  "key": "Tag",
+                  "operator": "EQUALS",
+                  "value": "app",
+                  "resource_type": "Condition"
+                }
+              ],
+              "resource_type": "Group",
+              "id": "app-vms",
+              "display_name": "app-vms"
+            },
+            "resource_type": "ChildGroup",
+            "marked_for_delete":{{ delete }},
+            "mark_for_override": false
+          }
+        ]
+      },
+      "resource_type": "ChildDomain"
+    }
+  ]
+}
