@@ -1,4 +1,4 @@
-# Copyright 2017-2020 VMware, Inc.  All rights reserved
+# Copyright 2017-2022 VMware, Inc.  All rights reserved
 #
 # The BSD-2 license (the "License") set forth below applies to all
 # parts of the NSX-T SDK Sample Code project.  You may not use this
@@ -31,151 +31,131 @@
 Set-PowerCLIConfiguration -Scope User -ParticipateInCEIP $true -Confirm:$false | Out-Null
 Set-PowerCLIConfiguration -Scope User -InvalidCertificateAction:Ignore -Confirm:$false | Out-Null
 
-$NSX_IP = "10.114.200.41"
+$NSX_IP = "10.221.109.5"
 $NSX_User = "admin"
-$NSX_Password = "myPassword1!myPassword1!"
+$NSX_Password = "VMware1!VMware1!"
 
 Write-Host "Connecting to NSX Manager ..."
-Connect-NsxtServer -Server $NSX_IP -User $NSX_User -Password $NSX_Password
+$n = Connect-NsxServer -Server $NSX_IP -User $NSX_User -Password $NSX_Password
 
 function createT0($T0GatewayName, $EdgeClusterName) {
-
-    $t0s = Get-NsxtPolicyService -Name "com.vmware.nsx_policy.infra.tier0s"
-    $t0LocaleServices = Get-NsxtPolicyService -Name "com.vmware.nsx_policy.infra.tier_0s.locale_services"
-    $edges = Get-NsxtPolicyService -Name "com.vmware.nsx_policy.infra.sites.enforcement_points.edge_clusters"
-
-    $edgeClusters = ($edges.list("default","default").results | where {$_.display_name -eq $EdgeClusterName})
-
-    $t0Spec = $t0s.help.patch.tier0.Create()
-    $t0Spec.id = $T0GatewayName
-    $t0Spec.display_name = $T0GatewayName
-    $t0Spec.ha_mode = "ACTIVE_STANDBY"
-    $t0Spec.failover_mode = "NON_PREEMPTIVE"
-    $t0Gateway = $t0s.patch($T0GatewayName, $t0Spec)
-
-    $localeServiceSpec = $t0LocaleServices.help.patch.locale_services.create()
-    $localeServiceSpec.display_name = "default"
-    $localeServiceSpec.edge_cluster_path = $edgeClusters.path
-    $localeService = $t0LocaleServices.patch($T0GatewayName, "default", $localeServiceSpec)
-    Write-Host "Created T0 Gateway $T0GatewayName ..."
-
+    $t0s = Invoke-ListTier0s -Server $n
+    $t0 = $t0s.Results | where {$_.DisplayName -eq $T0GatewayName}
+    if ($t0) {
+        Write-Host "T0 Gateway $T0GatewayName already exists."
+    } else {
+        $t0 = Initialize-Tier0 -ArpLimit 5000 -DisplayName $T0GatewayName
+        $createdT0 = Invoke-CreateOrReplaceTier0 -Server $n -Tier0Id $T0GatewayName -Tier0 $t0
+        Write-Host "Created T0 Gateway $T0GatewayName ..."
+    }
 }
 
 function createT1($T1GatewayName, $T0GatewayName, $EdgeClusterName) {
-    $t1GatewayPolicyService = Get-NsxtPolicyService -Name "com.vmware.nsx_policy.infra.tier1s"
-    $t0s = Get-NsxtPolicyService -Name "com.vmware.nsx_policy.infra.tier0s"
+    $t1s = Invoke-ListTier1 -Server $n
+    $t1 = $t1s.Results | where {$_.DisplayName -eq $T1GatewayName}
+    if ($t1) {
+        Write-Host "T1 Gateway $T1GatewayName already exists."
+    } else {
+        $t0s = Invoke-ListTier0s -Server $n
+        $t0 = $t0s.Results | where {$_.DisplayName -eq $T0GatewayName}
+        if ($t0) {
+            $t1 = Initialize-Tier1 -ArpLimit 5000 -DisplayName $T1GatewayName -Tier0Path $t0.Path
+            $createdT1 = Invoke-CreateOrReplaceTier1 -Server $n -Tier1Id $T1GatewayName -Tier1 $t1
+            $edgeClusters = Invoke-ListEdgeClustersForEnforcementPoint -Server $n -SiteId default -EnforcementPointId default 
+            $edgeCluster = $edgeClusters.Results | where {$_.DisplayName -eq $EdgeClusterName} 
+            $localeService = Initialize-LocaleServices -EdgeClusterPath $edgeCluster.Path -DisplayName default -Id default
+            # Create the 'default' LocaleService to the Tier-1
+            # Need to delete the LocaleService before removing the Tier-1
+            Invoke-PatchTier1LocaleServices -Server $n -Tier1Id $createdT1.Id -LocaleServices $localeService -LocaleServicesId default
 
-    $t0 = ($t0s.list().results | where {$_.display_name -eq $T0Gatewayname})
-    $t0Path = $t0.path
-
-    $t1Spec = $t1GatewayPolicyService.help.patch.tier1.Create()
-    $t1Spec.id = $T1GatewayName
-    $t1Spec.display_name = $T1GatewayName
-    $t1Spec.tier0_path = $t0Path
-    $t1Spec.route_advertisement_types = @("TIER1_NAT", "TIER1_LB_VIP", "TIER1_LB_SNAT", "TIER1_DNS_FORWARDER_IP", "TIER1_CONNECTED", "TIER1_STATIC_ROUTES", "TIER1_IPSEC_LOCAL_ENDPOINT") 
-    $t1Gateway = $t1GatewayPolicyService.patch($T1GatewayName, $t1Spec)
-    Write-Host "Created T1 Gateway $T1GatewayName ..."
+            Write-Host "Created T1 Gateway $T1GatewayName ..."
+        } else {
+            Write-Host "Unable to find Tier0 Gateway $T0GatewayName. Not creating Tier1 Gateway $T1GatewayName"
+        }
+    }
 }
 
 function createSegment($SegmentName, $T1GatewayName, $GatewayCIDR, $TransportZone) {
-    $segments = Get-NsxtPolicyService -Name "com.vmware.nsx_policy.infra.segments"
-    $t1s = Get-NsxtPolicyService -Name "com.vmware.nsx_policy.infra.tier1s"
-    $tzs = Get-NsxtPolicyService -name "com.vmware.nsx_policy.infra.sites.enforcement_points.transport_zones" 
 
-    $t1 = $t1s.get($T1GatewayName)
-    $tz = ($tzs.list('default', 'default').results | where { $_.display_name -eq $TransportZone})
-
-    $segmentSpec = $segments.help.patch.segment.Create()
-    $segmentSpec.id = $SegmentName
-    $segmentSpec.display_name = $SegmentName
-    $segmentSpec.transport_zone_path = $tz.path
-    $segmentSpec.connectivity_path = $t1.path
-    $segmentSpec.advanced_config.connectivity = "ON"
-
-    $subnetSpec = $segments.help.patch.segment.subnets.Element.Create()
-    $subnetSpec.gateway_address = $GatewayCIDR
-    $segmentSpec.subnets.Add($subnetSpec) | Out-Null
-    $segments.patch($SegmentName, $segmentSpec)
-    Write-Host "Created Segment $SegmentName ..."
+    $segments = Invoke-ListAllInfraSegments -Server $n
+    $segment = $segments.Results | where {$_.DisplayName -eq $SegmentName}
+    if ($segment) {
+        Write-Host "Segment $SegmentName already exists."
+    } else {
+        if ($TransportZone) {
+            $tzs = Invoke-ListTransportZonesForEnforcementPoint -Server $n -EnforcementpointId "default" -SiteId "default"
+            $tz = $tzs.Results | where {$_.DisplayName -eq $TransportZone}
+            if (! $tz) {
+                Write-Host "Unable to find Transport Zone $TransportZone. Exiting"
+                exit
+            }
+        }
+        $subnet = Initialize-SegmentSubnet -GatewayAddress $GatewayCIDR
+        $t1s = Invoke-ListTier1 -Server $n
+        $t1 = $t1s.Results | where {$_.DisplayName -eq $T1GatewayName}
+        if ($t1) {
+            $segment = Initialize-Segment -DisplayName $SegmentName -TransportZonePath $tz.Path -Subnets $subnet -ConnectivityPath $t1.Path
+            $createdSegment = Invoke-CreateOrReplaceInfraSegment -Server $n -Segment $segment -SegmentId $SegmentName
+            Write-Host "Created Segment $SegmentName ..."
+        } else {
+            Write-Host "Unable to find Tier1 Gateway $T1Gatewayname. Not creating Segment $SegmentName"
+        }
+    }
 }
 
 function createGroup($GroupName, $MemberType, $Key, $Operator, $Value) {
-    $groups = Get-NsxtPolicyService -Name "com.vmware.nsx_policy.infra.domains.groups"
 
-    $groupSpec = $groups.help.patch.group.Create()
-    $groupSpec.id = $GroupName
-    $groupSpec.display_name = $GroupName
-
-    $expressionSpec = $groups.help.patch.group.expression.Element.condition.Create()
-    $expressionSpec.member_type = $MemberType
-    $expressionSpec.key = $Key
-    $expressionSpec.operator = $Operator
-    $expressionSpec.value = $value
-    $groupSpec.expression.Add($expressionSpec) | Out-Null
-    $groups.patch('default', $GroupName, $groupSpec)
-    Write-Host "Created Group $GroupName ..."
+    $allGroups = Invoke-ListGroupForDomain -Server $n -DomainId default
+    $gp = $allGroups.Results | where {$_.DisplayName -eq $GroupName}
+    if ($gp) {
+        Write-Host "Group $GroupName already exists."
+    } else {
+        $cond = Initialize-Condition -ResourceType Condition -Id $GroupName -MemberType $MemberType -Value $Value -Key $Key -Operator $Operator
+        $group = Initialize-Group -DisplayName $GroupName -Expression @($cond)
+        $createdGroup = Invoke-PatchGroupForDomain -Server $n -DomainId default -Group $group -GroupId $GroupName
+        Write-Host "Created Group $GroupName ..."
+    }
 }
 
 function createDFWSecurityPolicy($PolicyName, $Category, $RuleName, $SourceGroups, $DestinationGroups, $ServiceList, $Action) {
-    $policies = Get-NsxtPolicyService -Name com.vmware.nsx_policy.infra.domains.security_policies
-    $groups = Get-NsxtPolicyService -Name "com.vmware.nsx_policy.infra.domains.groups"
-    $services = Get-NsxtPolicyService -Name "com.vmware.nsx_policy.infra.services"
 
-    $sourcePath = @()
-    foreach ($name in $SourceGroups) {
-        if ($name -eq "ANY") {
-            $sourcePath += "ANY"
+    $alls = Invoke-ListServicesForTenant -Server $n
+    $AllGroups = Invoke-ListGroupForDomain -DomainId default -Server $n
+
+    $ServicePathList = @()
+    foreach ($serv in $ServiceList) {
+        $s = $alls.Results | where {$_.DisplayName -eq $serv}
+        $ServicePathList += $s.Path
+    }
+
+    $SourceGroupList = @()
+    foreach ($gp in $SourceGroups) {
+        if ($gp -eq "ANY") {
+            $SourceGroupList += "ANY"
         } else {
-            $g = ($groups.list('default').results | where {$_.display_name -eq $name})
-            $sourcePath += $g.path
+            $g = $AllGroups.Results | where {$_.DisplayName -eq $gp}
+            $SourceGroupList += $g.Path
         }
     }
 
-    $destPath = @()
-    foreach ($name in $DestinationGroups) {
-        if ($name -eq "ANY") {
-            $destPath += "ANY"
+    $DestinationGroupList = @()
+    foreach ($gp in $DestinationGroups) {
+        if ($gp -eq "ANY") {
+            $DestinationGroupList += "ANY"
         } else {
-            $g = ($groups.list('default').results | where {$_.display_name -eq $name})
-            $destPath += $g.path
+            $g = $AllGroups.Results | where {$_.DisplayName -eq $gp}
+            $DestinationGroupList += $g.Path
         }
     }
-
-    $servicePath = @()
-    $full_list = $services.list().results
-    foreach ($name in $ServiceList) {
-        if ($name -eq "ANY") {
-            $servicePath += "ANY"
-        } else {
-            $s = ($full_list | where {$_.display_name -eq $name})
-            $servicePath += $s.path
-        }
-    }
-
-    $policySpec = $policies.help.patch.security_policy.Create()
-    $policySpec.id = $PolicyName
-    $policySpec.display_name = $PolicyName
-    $policySpec.category = $Category
-
-    $ruleSpec = $policies.help.patch.security_policy.rules.Element.create()
-    $ruleSpec.display_name = $RuleName
-    $ruleSpec.source_groups = $sourcePath
-    $ruleSpec.destination_groups = $destPath
-    $ruleSpec.services = $servicePath
-    $ruleSpec.action = $Action
-    $policySpec.rules.Add($ruleSpec) | Out-Null
-    $policies.patch('default', $PolicyName, $policySpec)
+    
+    $r = Initialize-Rule -DisplayName $RuleName -Id $RuleName -SourceGroups $SourceGroupList -DestinationGroups $DestinationGroupList -Services $ServicePathList -Action $Action
+    $sp = Initialize-SecurityPolicy -DisplayName $PolicyName -Id $PolicyName -Rules @($r) -Category $Category
+    $createdSP = Invoke-PatchSecurityPolicyForDomain -Server $n -DomainId default -SecurityPolicyId $PolicyName -SecurityPolicy $sp
     Write-Host "Created DFW Policy $PolicyName with Rule $RuleName ..."
 }
 
 
 if ($args[0] -eq "delete") {
-    $policies = Get-NsxtPolicyService -Name com.vmware.nsx_policy.infra.domains.security_policies
-    $groups = Get-NsxtPolicyService -Name "com.vmware.nsx_policy.infra.domains.groups"
-    $segments = Get-NsxtPolicyService -Name "com.vmware.nsx_policy.infra.segments"
-    $t1s = Get-NsxtPolicyService -Name "com.vmware.nsx_policy.infra.tier1s"
-    $t0LocaleServices = Get-NsxtPolicyService -Name "com.vmware.nsx_policy.infra.tier_0s.locale_services"
-    $t0s = Get-NsxtPolicyService -Name "com.vmware.nsx_policy.infra.tier0s"
 
     $PCLIPolicies = @("PCLI-Allow-SQL", "PCLI-Allow-HTTP", "PCLI-Ops")
     $PCLIGroups = @("PCLI-all-vms", "PCLI-web-vms", "PCLI-app-vms", "PCLI-db-vms")
@@ -184,43 +164,44 @@ if ($args[0] -eq "delete") {
     $PCLIT0s = @("PCLI-3Tier-T0")
 
     foreach ($item in $PCLIPolicies) {
-        $p = ($policies.list('default').results | where {$_.display_name -eq $item})
-        $policies.delete('default', $p.id)
+
+        Invoke-DeleteSecurityPolicyForDomain -Server $n -Domain default -SecurityPolicyId $item
         Write-Host "Deleted Policy $item ..."
     }
+    Start-Sleep -s 5
 
     foreach ($item in $PCLIGroups) {
-        $g = ($groups.list('default').results | where {$_.display_name -eq $item})
-        $groups.delete('default', $g.id)
+
+        Invoke-DeleteGroup -Server $n -Domain default -GroupID $item
         Write-Host "Deleted Group $item ..."
     }
+    Start-Sleep -s 5
 
     foreach ($item in $PCLISegments) {
-        $s = ($segments.list().results | where {$_.display_name -eq $item})
-        $segments.delete($s.id)
+
+        Invoke-DeleteInfraSegment -Server $n -SegmentId $item
         Write-Host "Deleted Segment $item ..."
     }
+    Start-Sleep -s 5
 
     foreach ($item in $PCLIT1s) {
-        $t1 = ($t1s.list().results | where {$_.display_name -eq $item})
-        $t1s.delete($t1.id)
+        Invoke-DeleteTier1LocaleServices -Server $n -Tier1Id $item -LocaleServicesId default
+        Invoke-DeleteTier1 -Server $n -Tier1Id $item
         Write-Host "Deleted Tier1 Gateway $item ..."
     }
+    Start-Sleep -s 5
 
     foreach ($item in $PCLIT0s) {
-        $t0 = ($t0s.list().results | where {$_.display_name -eq $item})
-        $t0ls = ($t0LocaleServices.list($t0.id).results | where {$_.display_name -eq 'default'})
-        $t0LocaleServices.delete($t0.id, $t0ls.id)
-        $t0s.delete($t0.id)
+        Invoke-DeleteTier0 -Server $n -Tier0Id $item
         Write-Host "Deleted Tier0 Gateway $item ..."
     }
 
 } else {
 
-    createT0 "PCLI-3Tier-T0" "Edge-Cluster-01"
+    createT0 "PCLI-3Tier-T0"
 
-    createT1 "PCLI-VMW-T1" "PCLI-3Tier-T0" "Edge-Cluster-01"
-    createT1 "PCLI-Client-T1" "PCLI-3Tier-T0" "Edge-Cluster-01"
+    createT1 "PCLI-VMW-T1" "PCLI-3Tier-T0" "edge-cluster-01"
+    createT1 "PCLI-Client-T1" "PCLI-3Tier-T0" "edge-cluster-01"
 
     createSegment "PCLI-3Tier" "PCLI-VMW-T1" "192.20.10.1/24" "nsx-overlay-transportzone"
     createSegment "PCLI-Client" "PCLI-Client-T1" "192.20.50.1/24" "nsx-overlay-transportzone"
