@@ -28,8 +28,18 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 ---
-- import_playbook: 3-tier-app-Security-Policies.yml state='absent'
-- import_playbook: 3-tier-app-Groups.yml state='absent'
-- import_playbook: 3-tier-app-Segments.yml state='absent'
-- import_playbook: 3-tier-app-T1-Gateways.yml state='absent'
-- import_playbook: 3-tier-app-T0-Gateways.yml state='absent'
+- import_playbook: 3-tier-app-Security-Policies.yml
+  vars:
+    state: absent
+- import_playbook: 3-tier-app-Groups.yml
+  vars:
+    state: absent
+- import_playbook: 3-tier-app-Segments.yml
+  vars:
+    state: absent
+- import_playbook: 3-tier-app-T1-Gateways.yml
+  vars:
+    state: absent
+- import_playbook: 3-tier-app-T0-Gateways.yml
+  vars:
+    state: absent
