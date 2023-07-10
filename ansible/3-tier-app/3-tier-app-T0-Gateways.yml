@@ -29,15 +29,15 @@
 # POSSIBILITY OF SUCH DAMAGE.
 ---
 - hosts: localhost
-  become: yes
+  become: no
   vars:
-      nsx_manager: '10.114.200.41'
+      nsx_manager: '10.221.109.5'
       nsx_username: 'admin'
-      nsx_password: 'myPassword1!myPassword1!'
+      nsx_password: 'VMware1!VMware1!'
       validate_certs: 'false'
   tasks:
     - name: Tier0 ANS-3Tier-T0
-      nsxt_policy_tier0:
+      vmware.ansible_for_nsxt.nsxt_policy_tier0:
         hostname: "{{ nsx_manager }}"
         username: "{{ nsx_username }}"
         password: "{{ nsx_password }}"

@@ -29,15 +29,15 @@
 # POSSIBILITY OF SUCH DAMAGE.
 ---
 - hosts: localhost
-  become: yes
+  become: no
   vars:
-      nsx_manager: '10.114.200.41'
+      nsx_manager: '10.221.109.5'
       nsx_username: 'admin'
-      nsx_password: 'myPassword1!myPassword1!'
+      nsx_password: 'VMware1!VMware1!'
       validate_certs: 'false'
   tasks:
     - name: Tier1 ANS-VMW-T1
-      nsxt_policy_tier1:
+      vmware.ansible_for_nsxt.nsxt_policy_tier1:
         hostname: "{{ nsx_manager }}"
         username: "{{ nsx_username }}"
         password: "{{ nsx_password }}"
@@ -58,7 +58,7 @@
           - "TIER1_IPSEC_LOCAL_ENDPOINT"
 
     - name: Tier1 ANS-Client-T1
-      nsxt_policy_tier1:
+      vmware.ansible_for_nsxt.nsxt_policy_tier1:
         hostname: "{{ nsx_manager }}"
         username: "{{ nsx_username }}"
         password: "{{ nsx_password }}"
