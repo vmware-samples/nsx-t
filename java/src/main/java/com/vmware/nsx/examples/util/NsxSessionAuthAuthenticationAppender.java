@@ -63,7 +63,7 @@ public class NsxSessionAuthAuthenticationAppender implements RequestPreProcessor
             HttpRequest request, DataValue params,
             ExecutionContext executionContext) {
         char[] sessionId = (char [])executionContext.retrieveSecurityContext().getProperty(SessionSecurityContext.SESSION_ID_KEY);
-        //request.addHeader(SESSION_HEADER_NAME, new String(sessionId));
+        request.addHeader(SESSION_HEADER_NAME, new String(sessionId));
         request.addHeader(XSRF_TOKEN_HEADER_NAME, xsrfToken);
         return request;
     }
