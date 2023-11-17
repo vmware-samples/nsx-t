@@ -1,7 +1,7 @@
 /*
  * NSX-T SDK Sample Code
  *
- * Copyright 2019 VMware, Inc.  All rights reserved
+ * Copyright 2019-2023 VMware, Inc.  All rights reserved
  *
  * The BSD-2 license (the "License") set forth below applies to all
  * parts of the NSX-T SDK Sample Code project.  You may not use this
