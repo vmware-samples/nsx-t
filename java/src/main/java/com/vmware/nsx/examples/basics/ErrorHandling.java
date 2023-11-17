@@ -73,12 +73,11 @@ public class ErrorHandling {
 
         // Create a transport zone, but intentionally pass an incorrect
         // overlay type, so we cause an error.
-        TransportZone transportZone = new TransportZone.Builder(
-                "zappa")  // Invalid overlay type
-                        .setDisplayName("My Transport Zone")
-                        .setDescription(
-                                "Transport zone for error handling demo")
-                        .setHostSwitchName("hostswitch1").build();
+        TransportZone transportZone = new TransportZone.Builder()  // Invalid overlay type
+                .setDisplayName("My Transport Zone")
+                .setDescription(
+                        "Transport zone for error handling demo")
+                .build();
         try {
             zoneService.create(transportZone);
         } catch (Error ex) {

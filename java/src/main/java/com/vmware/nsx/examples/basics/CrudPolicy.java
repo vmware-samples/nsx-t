@@ -85,7 +85,7 @@ public class CrudPolicy {
         subnets.add(subnet);
         Segment newSegment = new Segment.Builder()
         		.setSubnets(subnets)
-        		.setTransportZonePath("/infra/sites/default/enforcement-points/default/transport-zones/c1e7f78b-07b3-47c4-85f1-8fdde6acc54d")
+                .setTransportZonePath("/infra/sites/default/enforcement-points/default/transport-zones/1b3a2f36-bfd1-443e-a0f6-4de01abc963e")
         		.build();
         segmentsService.update("t1_test", "062b4bd3-8cca-413b-85bf-0f03c1adbb7b", newSegment);
         

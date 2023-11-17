@@ -111,7 +111,7 @@ public class LogicalStats {
 
         // Find all logical switches and show statistics for each.
         LogicalSwitchListResult allLs = lsService.list(null, null, null, null,
-                null, null, null, null, null, null, null, null);
+                null, null, null, null, null, null, null, null, null);
         System.out.println("***** Showing statistics for "
                 + allLs.getResultCount() + " logical switches");
         for (LogicalSwitch ls : allLs.getResults()) {
@@ -120,7 +120,7 @@ public class LogicalStats {
 
             // Retrieve the statistics for the switch
             LogicalSwitchStatistics stats = lsStatisticsService.get(ls.getId(),
-                    null);
+                    null, null, null);
             printLogicalSwitchStats(stats);
             System.out.println();
         }

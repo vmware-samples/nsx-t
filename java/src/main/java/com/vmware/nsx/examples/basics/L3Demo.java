@@ -166,36 +166,37 @@ public class L3Demo {
         Sections fwSectionService = apiClient.createStub(Sections.class);
 
         // Create a transport tone.
-        TransportZone newTZ = new TransportZone.Builder(
-                TransportZone.TRANSPORT_TYPE_OVERLAY)
+        TransportZone newTZ = new TransportZone.Builder()
                         .setDisplayName("Two Tier App Demo Transport Zone")
                         .setDescription(
                                 "Transport zone for two-tier app demo")
-                        .setHostSwitchName("hostswitch")
                         .build();
         TransportZone demoTZ = zoneService.create(newTZ);
 
         // Create a logical switch for the db tier
-        LogicalSwitch newLS = new LogicalSwitch.Builder(
-                LogicalSwitch.ADMIN_STATE_UP, demoTZ.getId())
+        LogicalSwitch newLS = new LogicalSwitch.Builder()
                         .setReplicationMode(
                                 LogicalSwitch.REPLICATION_MODE_MTEP).setDisplayName("ls-db")
+                .setTransportZoneId(demoTZ.getId())
+                .setAdminState(LogicalSwitch.ADMIN_STATE_UP)
                         .build();
         LogicalSwitch dbLS = switchService.create(newLS);
 
         // Create a logical switch for the web tier
-        newLS = new LogicalSwitch.Builder(
-                LogicalSwitch.ADMIN_STATE_UP, demoTZ.getId())
-                        .setReplicationMode(
-                                LogicalSwitch.REPLICATION_MODE_MTEP).setDisplayName("ls-web")
-                        .build();
+        newLS = new LogicalSwitch.Builder()
+                .setReplicationMode(
+                        LogicalSwitch.REPLICATION_MODE_MTEP).setDisplayName("ls-web")
+                .setTransportZoneId(demoTZ.getId())
+                .setAdminState(LogicalSwitch.ADMIN_STATE_UP)
+                .build();
         LogicalSwitch webLS = switchService.create(newLS);
 
         // Create a logical router that will route traffic between the web and db tiers
-        LogicalRouter newRouter = new LogicalRouter.Builder(
-                LogicalRouter.ROUTER_TYPE_TIER1).setDisplayName("lr-demo")
-                        .setFailoverMode(LogicalRouter.FAILOVER_MODE_PREEMPTIVE)
-                        .build();
+        LogicalRouter newRouter = new LogicalRouter.Builder()
+                .setDisplayName("lr-demo")
+                .setFailoverMode(LogicalRouter.FAILOVER_MODE_PREEMPTIVE)
+                .setRouterType(LogicalRouter.ROUTER_TYPE_TIER1)
+                .build();
         LogicalRouter lr = routerService.create(newRouter);
 
         // Create a logical port on the db and web logical switches. We
@@ -203,13 +204,19 @@ public class L3Demo {
         // route between the logical switches.
 
         // Logical port on the db logical switch
-        LogicalPort newLP = new LogicalPort.Builder(LogicalPort.ADMIN_STATE_UP,
-                dbLS.getId()).setDisplayName("dbTierUplinkToRouter").build();
+        LogicalPort newLP = new LogicalPort.Builder()
+                .setDisplayName("dbTierUplinkToRouter")
+                .setAdminState(LogicalPort.ADMIN_STATE_UP)
+                .setLogicalSwitchId(dbLS.getId())
+                .build();
         LogicalPort dbPortOnLS = portService.create(newLP);
 
         // Logical port on the web logical switch
-        newLP = new LogicalPort.Builder(LogicalPort.ADMIN_STATE_UP,
-                webLS.getId()).setDisplayName("webTierUplinkToRouter").build();
+        newLP = new LogicalPort.Builder()
+                .setAdminState(LogicalPort.ADMIN_STATE_UP)
+                .setLogicalSwitchId(webLS.getId())
+                .setDisplayName("webTierUplinkToRouter")
+                .build();
         LogicalPort webPortOnLS = portService.create(newLP);
 
         // Populate a logical router downlink port payload and configure the
@@ -217,12 +224,17 @@ public class L3Demo {
         // db tier's logical switch.
         List<IPSubnet> subnets = new ArrayList<IPSubnet>();
         subnets.add(
-                new IPSubnet.Builder(Arrays.asList("192.168.1.1"), 24).build());
+                new IPSubnet.Builder()
+                        .setIpAddresses(Arrays.asList("192.168.1.1"))
+                        .setPrefixLength((long) 24)
+                        .build());
         ResourceReference linkedLSPort = new ResourceReference.Builder()
                 .setTargetId(dbPortOnLS.getId()).build();
-        LogicalRouterDownLinkPort newLRPort = new LogicalRouterDownLinkPort.Builder(
-                subnets, lr.getId())
-                        .setLinkedLogicalSwitchPortId(linkedLSPort).build();
+        LogicalRouterDownLinkPort newLRPort = new LogicalRouterDownLinkPort.Builder()
+                .setSubnets(subnets)
+                .setLogicalRouterId(lr.getId())
+                .setLinkedLogicalSwitchPortId(linkedLSPort)
+                .build();
         // Create the downlink port
         LogicalRouterDownLinkPort lrPortForDbTier = lrportService
                 .create(newLRPort)._convertTo(LogicalRouterDownLinkPort.class);
@@ -231,12 +243,16 @@ public class L3Demo {
         // port with the CIDR 192.168.2.1/24. We will attach this port to the
         // web tier's logical switch.
         subnets = new ArrayList<IPSubnet>();
-        subnets.add(
-                new IPSubnet.Builder(Arrays.asList("192.168.2.1"), 24).build());
+        subnets.add(new IPSubnet.Builder()
+                .setIpAddresses(Arrays.asList("192.168.2.1"))
+                .setPrefixLength((long) 24)
+                .build());
         linkedLSPort = new ResourceReference.Builder()
                 .setTargetId(webPortOnLS.getId()).build();
-        newLRPort = new LogicalRouterDownLinkPort.Builder(subnets, lr.getId())
-                .setLinkedLogicalSwitchPortId(linkedLSPort).build();
+        newLRPort = new LogicalRouterDownLinkPort.Builder()
+                .setSubnets(subnets)
+                .setLogicalRouterId(lr.getId())
+                .build();
         // Create the downlink port
         LogicalRouterDownLinkPort lrPortForWebTier = lrportService
                 .create(newLRPort)._convertTo(LogicalRouterDownLinkPort.class);
@@ -253,10 +269,11 @@ public class L3Demo {
         services.add(
                 new FirewallService.Builder().setTargetType("NSServiceGroup")
                         .setTargetId(MSSQL_SERVER_NS_GROUP_ID).build());
-        FirewallRule msSQLRule = new FirewallRule.Builder(
-                FirewallRule.ACTION_ALLOW).setDisplayName("Allow MSSQL Server")
-                        .setIpProtocol(FirewallRule.IP_PROTOCOL_IPV4_IPV6)
-                        .setServices(services).build();
+        FirewallRule msSQLRule = new FirewallRule.Builder().setDisplayName("Allow MSSQL Server")
+                .setIpProtocol(FirewallRule.IP_PROTOCOL_IPV4_IPV6)
+                .setAction(FirewallRule.ACTION_ALLOW)
+                .setServices(services)
+                .build();
 
         // The second rule will allow ICMP echo requests and responses.
         final String ICMP_ECHO_REQUEST_NS_SVC_ID = "5531a880-61aa-42cc-ba4b-13b9ea611e2f";
@@ -266,25 +283,26 @@ public class L3Demo {
                 .setTargetId(ICMP_ECHO_REQUEST_NS_SVC_ID).build());
         services.add(new FirewallService.Builder().setTargetType("NSService")
                 .setTargetId(ICMP_ECHO_REPLY_NS_SVC_ID).build());
-        FirewallRule icmpRule = new FirewallRule.Builder(
-                FirewallRule.ACTION_ALLOW).setDisplayName("Allow ICMP Echo")
-                        .setIpProtocol(FirewallRule.IP_PROTOCOL_IPV4_IPV6)
-                        .setServices(services).build();
+        FirewallRule icmpRule = new FirewallRule.Builder().setDisplayName("Allow ICMP Echo")
+                .setIpProtocol(FirewallRule.IP_PROTOCOL_IPV4_IPV6)
+                .setAction(FirewallRule.ACTION_ALLOW)
+                .setServices(services).build();
 
         // The third rule will drop all traffic not passed by the previous
         // rules.
-        FirewallRule blockAllRule = new FirewallRule.Builder(
-                FirewallRule.ACTION_DROP).setDisplayName("Drop all")
-                        .setIpProtocol(FirewallRule.IP_PROTOCOL_IPV4_IPV6)
-                        .build();
+        FirewallRule blockAllRule = new FirewallRule.Builder().setDisplayName("Drop all")
+                .setIpProtocol(FirewallRule.IP_PROTOCOL_IPV4_IPV6)
+                .setAction(FirewallRule.ACTION_DROP)
+                .build();
 
         // Add all rules to a new firewall section and create the section.
-        FirewallSectionRuleList ruleList = new FirewallSectionRuleList.Builder(
-                FirewallSection.SECTION_TYPE_LAYER3,
-                true,
-                Arrays.asList(msSQLRule, icmpRule, blockAllRule))
-                        .setDisplayName("MSSQL Server")
-                        .setDescription("Only allow MSSQL server traffic").build();
+        FirewallSectionRuleList ruleList = new FirewallSectionRuleList.Builder()
+                .setSectionType(FirewallSection.SECTION_TYPE_LAYER3)
+                .setStateful(true)
+                .setRules(Arrays.asList(msSQLRule, icmpRule, blockAllRule))
+                .setDisplayName("MSSQL Server")
+                .setDescription("Only allow MSSQL server traffic")
+                .build();
         FirewallSectionRuleList demoSection = fwSectionService.createwithrules(ruleList, null, "insert_top");
 
         // Re-read the firewall section so that we are operating on up-to-date

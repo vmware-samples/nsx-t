@@ -45,12 +45,17 @@ import com.vmware.vapi.internal.protocol.client.rpc.HttpRequest;
 import com.vmware.vapi.protocol.client.http.RequestPreProcessor;
 import com.vmware.vapi.security.SessionSecurityContext;
 
+/*
+  RestClientApiProvider has methods for managing RequestPreProcessors. Class is
+  ProcessorManager, method is setPostProcessors.
+ */
 public class NsxSessionAuthAuthenticationAppender implements RequestPreProcessor {
+    private static final String SESSION_HEADER_NAME = "Cookie";
+    private static final String XSRF_TOKEN_HEADER_NAME = "X-Xsrf-Token";
+    private String xsrfToken;
 
-    private String headerName;
-
-    public NsxSessionAuthAuthenticationAppender(String headerName) {
-        this.headerName = headerName;
+    public NsxSessionAuthAuthenticationAppender(String xsrfToken) {
+        this.xsrfToken = xsrfToken;
     }
 
     @Override
@@ -58,8 +63,8 @@ public class NsxSessionAuthAuthenticationAppender implements RequestPreProcessor
             HttpRequest request, DataValue params,
             ExecutionContext executionContext) {
         char[] sessionId = (char [])executionContext.retrieveSecurityContext().getProperty(SessionSecurityContext.SESSION_ID_KEY);
-        request.addHeader(headerName, new String(sessionId));
+        //request.addHeader(SESSION_HEADER_NAME, new String(sessionId));
+        request.addHeader(XSRF_TOKEN_HEADER_NAME, xsrfToken);
         return request;
     }
-
 }

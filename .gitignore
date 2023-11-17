@@ -10,3 +10,4 @@ python/venv
 .classpath
 .project
 .settings
+.idea

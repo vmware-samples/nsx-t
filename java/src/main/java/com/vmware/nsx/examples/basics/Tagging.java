@@ -149,24 +149,28 @@ public class Tagging {
         // Create a transport zone and logical switch. We only
         // need these so we can create logical ports. They aren't
         // part of the demo.
-        TransportZone tz = new TransportZone.Builder(
-                TransportZone.TRANSPORT_TYPE_OVERLAY)
-                        .setDisplayName("Tagging Demo Transport Zone")
-                        .setDescription("Transport zone for tagging demo")
-                        .setHostSwitchName("hostswitch").build();
+        TransportZone tz = new TransportZone.Builder()
+                .setTransportType(TransportZone.TRANSPORT_TYPE_OVERLAY)
+                .setDisplayName("Tagging Demo Transport Zone")
+                .setDescription("Transport zone for tagging demo")
+                .build();
         tz = transportZonesService.create(tz);
-        LogicalSwitch ls = new LogicalSwitch.Builder(
-                LogicalSwitch.ADMIN_STATE_UP, tz.getId())
-                        .setReplicationMode(LogicalSwitch.REPLICATION_MODE_MTEP)
-                        .setDisplayName("ls-tag-demo").build();
+        LogicalSwitch ls = new LogicalSwitch.Builder()
+                .setAdminState(LogicalSwitch.ADMIN_STATE_UP)
+                .setTransportZoneId(tz.getId())
+                .setReplicationMode(LogicalSwitch.REPLICATION_MODE_MTEP)
+                .setDisplayName("ls-tag-demo").build();
         ls = logicalSwitchesService.create(ls);
 
         // First, create a new group whose members are any logical
         // ports with a tag scope of "color" and tag value of "green"
-        NSGroupTagExpression expression = new NSGroupTagExpression.Builder(
-                "LogicalPort").setScopeOp("EQUALS")
-                        .setScope("color").setTagOp("EQUALS").setTag("green")
-                        .build();
+        NSGroupTagExpression expression = new NSGroupTagExpression.Builder()
+                .setTargetType("LogicalPort")
+                .setScopeOp("EQUALS")
+                .setScope("color")
+                .setTagOp("EQUALS")
+                .setTag("green")
+                .build();
         NSGroup group = new NSGroup.Builder()
                 .setDisplayName("Green Logical Ports")
                 .setDescription(
@@ -175,10 +179,11 @@ public class Tagging {
         NSGroup greenGroup = nsGroupsService.create(group);
 
         // Now create another group for color:yellow logical ports.
-        expression = new NSGroupTagExpression.Builder(
-                "LogicalPort").setScopeOp("EQUALS")
-                        .setScope("color").setTagOp("EQUALS").setTag("green")
-                        .build();
+        expression = new NSGroupTagExpression.Builder()
+                .setTargetType("LogicalPort")
+                .setScopeOp("EQUALS")
+                .setScope("color").setTagOp("EQUALS").setTag("green")
+                .build();
         group = new NSGroup.Builder()
                 .setDisplayName("Yellow Logical Ports")
                 .setDescription(
@@ -198,9 +203,11 @@ public class Tagging {
 
         // Create a logical port with color:green
         Tag tag = new Tag.Builder().setScope("color").setTag("green").build();
-        LogicalPort lPort = new LogicalPort.Builder(LogicalPort.ADMIN_STATE_UP,
-                ls.getId()).setDisplayName("tagging-demo-lp1")
-                        .setTags(Arrays.asList(tag)).build();
+        LogicalPort lPort = new LogicalPort.Builder()
+                .setAdminState(LogicalPort.ADMIN_STATE_UP)
+                .setLogicalSwitchId(ls.getId())
+                .setDisplayName("tagging-demo-lp1")
+                .setTags(Arrays.asList(tag)).build();
         lPort = logicalPortsService.create(lPort);
         System.out.println("Logical port for this test has id " + lPort.getId());
 

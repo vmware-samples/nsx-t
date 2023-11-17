@@ -39,59 +39,46 @@
 
 package com.vmware.nsx.examples.basics;
 
-import org.apache.commons.cli.CommandLine;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Scanner;
 
+import com.vmware.nsx.TransportZones;
 import com.vmware.nsx.examples.util.ApiClientUtils;
 import com.vmware.nsx.examples.util.CliUtils;
-import com.vmware.nsx.fabric.Nodes;
-import com.vmware.nsx.fabric.nodes.Status;
-import com.vmware.nsx.model.Node;
-import com.vmware.nsx.model.NodeListResult;
-import com.vmware.nsx.model.NodeStatus;
-import com.vmware.vapi.bindings.Structure;
+import com.vmware.nsx.model.TransportZone;
+import com.vmware.nsx.model.TransportZoneListResult;
+import com.vmware.nsx_policy.Infra;
 import com.vmware.vapi.client.ApiClient;
+import org.apache.commons.cli.CommandLine;
 
 /*-
- * This example shows how to obtain a list of all fabric nodes and query their
- * status.
+ * This example shows how to use API session authentication.
  *
  * APIs used:
  *
- * List fabric nodes
- * GET /api/v1/fabric/nodes
- *
- * Get fabric node status
- * GET /api/v1/fabric/nodes/<node-id>/status
+ * Get infra object:
+ * GET /policy/api/v1/infra
  */
+public class SessionAuth {
 
-public class FabricNodes {
-
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         CommandLine cmd = CliUtils.parseArgs(args);
         String uri = "https://" + cmd.getOptionValue("nsx_host") + ":"
                 + cmd.getOptionValue("tcp_port", "443");
-        ApiClient apiClient = ApiClientUtils.createApiClient(uri,
+        ApiClient apiClient = ApiClientUtils.createApiClientWithSessionAuthentication(
+                uri,
                 cmd.getOptionValue("user"),
                 cmd.getOptionValue("password").toCharArray());
 
-        // Create the services we'll need.
-        Nodes fabricNodesService = apiClient.createStub(Nodes.class);
-        Status statusService = apiClient.createStub(Status.class);
-
-        NodeListResult result = fabricNodesService.list(null, null, null, null,
-                null, null, null, null, null, null, null, null);
-        for (Structure rawNode : result.getResults()) {
-            // Nodes are polymorphic, so we need to convert to a concrete type
-            Node fabricNode = rawNode._convertTo(Node.class);
-            System.out.println("Type: " + fabricNode.getResourceType()
-                    + ", Name: " + fabricNode.getDisplayName() + ", id: "
-                    + fabricNode.getId());
-            NodeStatus nodeStatus = statusService.get(fabricNode.getId(),
-                    "realtime");
-            System.out.println("    mp conn: "
-                    + nodeStatus.getMpaConnectivityStatus() + ", cp conn: "
-                    + nodeStatus.getLcpConnectivityStatus());
+        // Get the infra object
+        Infra infraService = apiClient.createStub(Infra.class);
+        try {
+            com.vmware.nsx_policy.model.Infra infra = infraService.get(null, null, null);
+            System.out.println(infra);
+        } catch (Exception e) {
+            System.out.println("Encountered exception " + e.getMessage());
         }
     }
-
 }

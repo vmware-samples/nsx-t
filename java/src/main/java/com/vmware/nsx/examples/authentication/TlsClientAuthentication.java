@@ -236,7 +236,7 @@ public class TlsClientAuthentication {
             TransportZones zoneService = apiClient
                     .createStub(TransportZones.class);
             TransportZoneListResult zones = zoneService.list(null, null, null,
-                    null, null, null, null, null);
+                    null, null, null, null, null, null, null);
             System.out.println("Initial list of transport zones - "
                     + zones.getResultCount() + " zones");
             System.out.println(zones);

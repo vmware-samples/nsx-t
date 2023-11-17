@@ -101,7 +101,7 @@ public class Vmc {
 
         // The API client can be used to call the NSX-T policy API...
         Infra infraService = apiClient.createStub(Infra.class);
-        com.vmware.nsx_policy.model.Infra infra = infraService.get(null);
+        com.vmware.nsx_policy.model.Infra infra = infraService.get(null, null, null);
         System.out.println(infra);
 
         Domains domains = apiClient.createStub(Domains.class);
