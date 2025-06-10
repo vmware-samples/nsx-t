@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+
+
 """
 NSX-T SDK Sample Code
 
